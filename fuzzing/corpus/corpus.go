@@ -2,6 +2,7 @@ package corpus
 
 import (
 	"math/rand"
+	"strings"
 
 	"bytes"
 	"context"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa/chain"
+	"github.com/crytic/medusa/chain/types"
 	"github.com/crytic/medusa/fuzzing/calls"
 	"github.com/crytic/medusa/fuzzing/contracts"
 	"github.com/crytic/medusa/fuzzing/coverage"
@@ -216,6 +218,37 @@ func (c *Corpus) Initialize(baseTestChain *chain.TestChain, contractDefinitions 
 			delete(deployedContracts, event.Contract.Address)
 			return nil
 		})
+
+		// for recording new discovered contracts
+		newChain.Events.ContractDiscoveryEventEmitter.Subscribe(func(event chain.ContractDiscoveryEvent) error {
+			matchedContract := contractDefinitions.MatchBytecode(event.Contract.InitBytecode, event.Contract.RuntimeBytecode)
+			if matchedContract != nil {
+				deployedContracts[event.Contract.Address] = matchedContract
+			}
+			return nil
+		})
+
+		// emit contract discovery event for updating deployedContracts
+		if len(onChainTargetContracts) > 0 {
+			for _, targetAddress := range onChainTargetContracts {
+				if common.IsHexAddress(targetAddress) {
+					runtimeBytecode := newChain.State().GetCode(common.HexToAddress(targetAddress))
+					if len(runtimeBytecode) > 0 {
+						newChain.Events.ContractDiscoveryEventEmitter.Publish(chain.ContractDiscoveryEvent{
+							Chain: newChain,
+							Contract: &types.DeployedContractBytecode{
+								Address:         common.HexToAddress(targetAddress),
+								RuntimeBytecode: runtimeBytecode,
+							},
+							IsInitialization: true,
+						})
+					} else {
+						return fmt.Errorf("the on-chain contract in %s is empty", strings.ToLower(targetAddress))
+					}
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {

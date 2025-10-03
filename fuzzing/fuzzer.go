@@ -112,6 +112,9 @@ type Fuzzer struct {
 	// and only when debug logging is enabled.
 	lastPCsLogMsg   time.Time
 	deploymentOrder []string
+
+	// is on-chain target
+	isOnChainTarget bool
 }
 
 // Amount of time between "total PCs hit" log messages. This message is only output when debug logging is enabled.
@@ -209,10 +212,34 @@ func NewFuzzer(config config.ProjectConfig) (*Fuzzer, error) {
 	fuzzer.baseValueSet.AddAddress(fuzzer.deployer)
 	for _, sender := range fuzzer.senders {
 		fuzzer.baseValueSet.AddAddress(sender)
+	} 
+
+	// init on-chain target contracts
+	for _, target := range config.Fuzzing.TargetContracts {
+		if common.IsHexAddress(target) {
+			fuzzer.isOnChainTarget = true
+			// load ABI to init contract definition
+			targetAddress := strings.ToLower(target)
+			fuzzer.logger.Info(fmt.Sprintf("Init contract of target %s ", targetAddress), colors.Reset)
+			contract, err := fuzzer.loadOnChainContract(targetAddress)
+			if err != nil {
+				return nil, err
+			}
+			contractDefinition := fuzzerTypes.NewContract(targetAddress, targetAddress, contract, nil)
+			fuzzer.contractDefinitions = append(fuzzer.contractDefinitions, contractDefinition)
+		}
+	}
+
+	if fuzzer.isOnChainTarget {
+		// check forking config
+		if !fuzzer.config.Fuzzing.TestChainConfig.ForkConfig.ForkModeEnabled {
+			return nil, errors.New("on-chain target fuzzing requires forking to be enabled")
+		}
+		fuzzer.Hooks.ChainSetupFunc = chainSetupOnChain
 	}
 
 	// If we have a compilation config
-	if fuzzer.config.Compilation != nil {
+	if !fuzzer.isOnChainTarget && fuzzer.config.Compilation != nil {
 		// Compile the targets specified in the compilation config
 		fuzzer.logger.Info("Compiling targets with ", colors.Bold, fuzzer.config.Compilation.Platform, colors.Reset)
 		start := time.Now()
@@ -505,6 +532,11 @@ func (f *Fuzzer) createTestChain() (*chain.TestChain, error) {
 
 	// Set our block gas limit
 	testChain.BlockGasLimit = blockGasLimit
+
+	// deal with on-chain target contracts
+	if f.isOnChainTarget {
+
+	}
 	return testChain, nil
 }
 

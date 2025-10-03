@@ -31,4 +31,7 @@ type MessageResults struct {
 	// that when the transaction is reverted, the value is also restored.
 	// The hooks are executed as a stack (to support revert operations).
 	OnRevertHookFuncs GenericHookFuncs
+
+	// ContractDiscoverys describes contracts that were discovered during execution, such as via CALL operations.
+	ContractDiscoverys []DeployedContractBytecode
 }

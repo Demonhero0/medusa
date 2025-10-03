@@ -17,6 +17,10 @@ type FuzzerWorkerEvents struct {
 	// longer exists on its underlying chain.
 	ContractDeleted events.EventEmitter[FuzzerWorkerContractDeletedEvent]
 
+	// ContractDiscovery emits events when the FuzzerWorker detects a contract that was not deployed during the lifetime of
+	// its underlying test chain, but exists on chain.
+	ContractDiscovery events.EventEmitter[FuzzerWorkerContractDiscoveryEvent]
+
 	// FuzzerWorkerChainCreated emits events when the FuzzerWorker has created its chain and is about to begin chain
 	// setup.
 	FuzzerWorkerChainCreated events.EventEmitter[FuzzerWorkerChainCreatedEvent]
@@ -54,6 +58,21 @@ type FuzzerWorkerContractAddedEvent struct {
 // FuzzerWorkerContractDeletedEvent describes an event where a fuzzing.FuzzerWorker detects a previously reported
 // deployed contract that no longer exists in the underlying test chain.
 type FuzzerWorkerContractDeletedEvent struct {
+	// Worker represents the instance of the fuzzing.FuzzerWorker for which the event occurred.
+	Worker *FuzzerWorker
+
+	// ContractAddress describes the address of the deployed contract.
+	ContractAddress common.Address
+
+	// ContractDefinition describes the compiled contract artifact definition which the fuzzing.Fuzzer matched to the
+	// deployed bytecode. If this could not be resolved, a nil value is provided.
+	ContractDefinition *contracts.Contract
+}
+
+// FuzzerWorkerContractDiscoveryEvent describes an event where a fuzzing.FuzzerWorker detects a contract that was not deployed during the lifetime of
+// its underlying test chain, but exists on chain. This can happen when forking from an existing network. The worker
+// attempts bytecode matching and updates the list of deployed contracts the worker should use for fuzz testing.
+type FuzzerWorkerContractDiscoveryEvent struct {
 	// Worker represents the instance of the fuzzing.FuzzerWorker for which the event occurred.
 	Worker *FuzzerWorker
 

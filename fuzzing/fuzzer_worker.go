@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"math/big"
 	"math/rand"
+	"strings"
 
+	"github.com/crytic/medusa/chain/types"
 	"github.com/crytic/medusa/logging/colors"
 
 	"github.com/crytic/medusa-geth/common"
@@ -12,6 +14,7 @@ import (
 	"github.com/crytic/medusa/fuzzing/calls"
 	fuzzerTypes "github.com/crytic/medusa/fuzzing/contracts"
 	"github.com/crytic/medusa/fuzzing/coverage"
+	"github.com/crytic/medusa/fuzzing/executiontracer"
 	"github.com/crytic/medusa/fuzzing/valuegeneration"
 	"github.com/crytic/medusa/utils"
 	"golang.org/x/exp/maps"
@@ -66,6 +69,9 @@ type FuzzerWorker struct {
 
 	// Events describes the event system for the FuzzerWorker.
 	Events FuzzerWorkerEvents
+
+	// executionTracer is used to trace EVM execution for each call in a call sequence.
+	executionTracer *executiontracer.ExecutionTracer
 }
 
 // newFuzzerWorker creates a new FuzzerWorker, assigning it the provided worker index/id and associating it to the
@@ -204,6 +210,49 @@ func (fw *FuzzerWorker) onChainContractDeploymentAddedEvent(event chain.Contract
 	return nil
 }
 
+// onChainContractDiscoveryEvent is the event callback used when the chain detects a contract that was not deployed during the lifetime of
+// the TestChain, but exists on chain. It attempts bytecode matching and updates the list of deployed contracts the worker should use for fuzz testing.
+func (fw *FuzzerWorker) onChainContractDiscoveryEvent(event chain.ContractDiscoveryEvent) error {
+
+	// Do not track the deployed contract if the contract deployment was a dynamic one and testAllContracts is false
+	if !fw.fuzzer.config.Fuzzing.Testing.TestAllContracts && !event.IsInitialization {
+		// Add the contract address to our value set so our generator can use it in calls.
+		fw.valueSet.AddAddress(event.Contract.Address)
+		return nil
+	}
+
+	// Add the contract address to our value set so our generator can use it in calls.
+	fw.valueSet.AddAddress(event.Contract.Address)
+
+	// Try to match it to a known contract definition
+	matchedDefinition := fw.fuzzer.contractDefinitions.MatchBytecode(event.Contract.InitBytecode, event.Contract.RuntimeBytecode)
+	// If we didn't match any deployment, report it.
+	if matchedDefinition == nil {
+		if fw.fuzzer.config.Fuzzing.Testing.StopOnFailedContractMatching {
+			return fmt.Errorf("could not match bytecode of a deployed contract to any contract definition known to the fuzzer")
+		} else {
+			return nil
+		}
+	}
+
+	// Set our deployed contract address in our deployed contract lookup, so we can reference it later.
+	fw.deployedContracts[event.Contract.Address] = matchedDefinition
+
+	// Update our methods
+	fw.updateMethods()
+
+	// Emit an event indicating the worker detected a new contract deployment on its chain.
+	err := fw.Events.ContractDiscovery.Publish(FuzzerWorkerContractDiscoveryEvent{
+		Worker:             fw,
+		ContractAddress:    event.Contract.Address,
+		ContractDefinition: matchedDefinition,
+	})
+	if err != nil {
+		return fmt.Errorf("error returned by an event handler when a worker emitted a deployed contract added event: %v", err)
+	}
+	return nil
+}
+
 // onChainContractDeploymentRemovedEvent is the event callback used when the chain detects removal of a previously
 // deployed contract. It updates the list of deployed contracts the worker should use for fuzz testing.
 func (fw *FuzzerWorker) onChainContractDeploymentRemovedEvent(event chain.ContractDeploymentsRemovedEvent) error {
@@ -245,7 +294,7 @@ func (fw *FuzzerWorker) updateMethods() {
 	// Loop through each deployed contract
 	for contractAddress, contractDefinition := range fw.deployedContracts {
 		// If we deployed the contract, also enumerate property tests and state changing methods.
-		for _, method := range contractDefinition.AssertionTestMethods {
+		for _, method := range contractDefinition.CompiledContract().Abi.Methods {
 			// Any non-constant method should be tracked as a state changing method.
 			if method.IsConstant() {
 				// Only track the pure/view method if testing view methods is enabled
@@ -381,6 +430,11 @@ func (fw *FuzzerWorker) testNextCallSequence() ([]ShrinkCallSequenceRequest, err
 		if utils.CheckContextDone(fw.fuzzer.ctx) {
 			return true, nil
 		}
+
+		// debug: print execution trace
+		// hash := utils.MessageToTransaction(latestCallSequenceElement.Call.ToCoreMessage()).Hash()
+		// fmt.Println(hash, fw.executionTracer.GetTrace(hash))
+		// fmt.Println(fw.executionTracer.GetTrace(hash).String())
 
 		// If we have shrink requests, it means we violated a test, so we quit at this point
 		return len(shrinkCallSequenceRequests) > 0, nil
@@ -655,8 +709,34 @@ func (fw *FuzzerWorker) run(baseTestChain *chain.TestChain) (bool, error) {
 			Worker: fw,
 			Chain:  initializedChain,
 		})
+
+		// Subcribe our chain event handler that detects contracts that were not deployed during the lifetime of the TestChain, but exist on chain.
+		initializedChain.Events.ContractDiscoveryEventEmitter.Subscribe(fw.onChainContractDiscoveryEvent)
+
+		// debug: tracing execution trace
+		// fw.executionTracer = executiontracer.NewExecutionTracer(fw.fuzzer.contractDefinitions, initializedChain, config.VeryVeryVerbose)
+		// initializedChain.AddTracer(fw.executionTracer.NativeTracer(), true, false)
 		return nil
 	})
+
+	// emit contract discovery event for initially present contracts
+	for _, targetAddress := range fw.fuzzer.config.Fuzzing.TargetContracts {
+		if common.IsHexAddress(targetAddress) {
+			runtimeBytecode := fw.chain.State().GetCode(common.HexToAddress(targetAddress))
+			if len(runtimeBytecode) > 0 {
+				fw.chain.Events.ContractDiscoveryEventEmitter.Publish(chain.ContractDiscoveryEvent{
+					Chain: fw.chain,
+					Contract: &types.DeployedContractBytecode{
+						Address:         common.HexToAddress(targetAddress),
+						RuntimeBytecode: runtimeBytecode,
+					},
+					IsInitialization: true,
+				})
+			} else {
+				return false, fmt.Errorf("the on-chain contract in %s is empty", strings.ToLower(targetAddress))
+			}
+		}
+	}
 
 	// Freeze a set of `fw.deployedContracts`'s keys so that we have a set of addresses present in baseTestChain.
 	// Feed this set to the coverage tracer.
