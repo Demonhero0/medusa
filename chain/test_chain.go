@@ -3,8 +3,9 @@ package chain
 import (
 	"errors"
 	"fmt"
-	compilationTypes "github.com/crytic/medusa/compilation/types"
 	"math/big"
+
+	compilationTypes "github.com/crytic/medusa/compilation/types"
 
 	"github.com/crytic/medusa/chain/state"
 	"golang.org/x/net/context"
@@ -251,6 +252,9 @@ func newTestChainWithStateFactory(
 		chain.AddTracer(cheatTracer.NativeTracer(), true, true)
 		cheatTracer.bindToChain(chain)
 	}
+
+	// Add our contract discovery tracer
+	chain.AddTracer(newTestChainContractDiscoveryTracer().NativeTracer(), true, true)
 
 	// Obtain the state for the genesis block and set it as the chain's current state.
 	stateDB, err := chain.StateAfterBlockNumber(0)
@@ -931,6 +935,22 @@ func (t *TestChain) emitContractChangeEvents(reverting bool, messageResults ...*
 				if err != nil {
 					return err
 				}
+			}
+		}
+	}
+
+	// emit contract discovery event
+	for j := len(messageResults) - 1; j >= 0; j-- {
+		result := messageResults[j]
+		for k := len(result.ContractDiscoverys) - 1; k >= 0; k-- {
+			deployedContractBytecode := result.ContractDiscoverys[k]
+
+			err = t.Events.ContractDiscoveryEventEmitter.Publish(ContractDiscoveryEvent{
+				Chain:    t,
+				Contract: &deployedContractBytecode,
+			})
+			if err != nil {
+				return err
 			}
 		}
 	}

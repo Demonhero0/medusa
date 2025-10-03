@@ -33,6 +33,11 @@ type TestChainEvents struct {
 	// are detected. e.g. If a contract is deployed and immediately destroyed within the same transaction, a
 	// ContractDeploymentsAddedEvent will be fired, followed immediately by a ContractDeploymentsRemovedEvent.
 	ContractDeploymentRemovedEventEmitter events.EventEmitter[ContractDeploymentsRemovedEvent]
+
+	// ContractDiscoveryAddedEventEmitter emits events indicating a contract was discovered on chain. This is called
+	// when a contract is detected to exist on chain, but was not deployed during the lifetime of the TestChain.
+	// This can happen when forking from an existing network.
+	ContractDiscoveryEventEmitter events.EventEmitter[ContractDiscoveryEvent]
 }
 
 // PendingBlockCreatedEvent describes an event where a new pending block was created, prior to any transactions being
@@ -107,4 +112,17 @@ type ContractDeploymentsRemovedEvent struct {
 
 	// Contract defines information for the contract which was deployed to the Chain.
 	Contract *types.DeployedContractBytecode
+}
+
+// ContractDeploymentsAddedEvent describes an event where a contract has become available on the TestChain, either
+// due to contract creation, or a self-destruct operation being reverted.
+type ContractDiscoveryEvent struct {
+	// Chain refers to the TestChain which emitted the event.
+	Chain *TestChain
+
+	// Contract defines information for the contract which was deployed to the Chain.
+	Contract *types.DeployedContractBytecode
+
+	// isInitialization describes whether this event is emitted for predeployed contract.
+	IsInitialization bool
 }
