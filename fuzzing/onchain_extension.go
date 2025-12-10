@@ -93,7 +93,6 @@ func getAbiStr(address string) (string, error) {
 }
 
 func chainSetupOnChain(fuzzer *Fuzzer, testChain *chain.TestChain) (*executiontracer.ExecutionTrace, error) {
-	fuzzer.logger.Info("Setting up test chain for on-chain target contracts")
 
 	for _, contractDefinition := range fuzzer.contractDefinitions {
 		contractAddress := common.HexToAddress(contractDefinition.Name())

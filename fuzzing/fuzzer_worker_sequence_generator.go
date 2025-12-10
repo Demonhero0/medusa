@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa/fuzzing/calls"
 	"github.com/crytic/medusa/fuzzing/contracts"
 	"github.com/crytic/medusa/fuzzing/valuegeneration"
@@ -266,6 +267,31 @@ func (g *CallSequenceGenerator) PopSequenceElement() (*calls.CallSequenceElement
 	// TODO: This feels a little hacky
 	if !g.worker.fuzzer.corpus.InitializingCorpus() {
 		element.Call.FillFromTestChainProperties(g.worker.chain)
+	}
+
+	// set internal call in helpercontract if enabled
+	if g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.EnabledInternalCall && *element.Call.To != FuzzHelperContractAddress {
+		slot0 := g.worker.chain.State().GetState(FuzzHelperContractAddress, common.HexToHash("0x0"))
+		// if slot0 is 0, always use set an internal call in helper contract
+		// else, use probability to determine if we should reset internal call in helper contract
+		if slot0.Big().Cmp(big.NewInt(0)) == 0 {
+			element, _ = ConvertToInternalCall(element)
+		} else if g.worker.randomProvider.Float32() < g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.InternalCallProbability {
+			element, _ = ConvertToInternalCall(element)
+		}
+	}
+
+	// send transaction with helper contract if enabled and with probability
+	if g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.EnabledContractCall {
+		if *element.Call.To != FuzzHelperContractAddress && g.worker.randomProvider.Float32() < g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.ContractCallProbability {
+			element, _ = ConvertToContractCall(element)
+		}
+
+		// Disable nonce and EOA checks if requested by config
+		if g.worker.fuzzer.config.Fuzzing.TestChainConfig.SkipAccountChecks {
+			element.Call.SkipFromEOACheck = true
+			element.Call.SkipNonceChecks = true
+		}
 	}
 
 	// Update our base sequence, advance our position, and return the processed element from this round.

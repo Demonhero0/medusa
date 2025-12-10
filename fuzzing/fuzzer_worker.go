@@ -293,6 +293,10 @@ func (fw *FuzzerWorker) updateMethods() {
 
 	// Loop through each deployed contract
 	for contractAddress, contractDefinition := range fw.deployedContracts {
+		// ignore the helper contract methods
+		if contractAddress == FuzzHelperContractAddress {
+			continue
+		}
 		// If we deployed the contract, also enumerate property tests and state changing methods.
 		for _, method := range contractDefinition.CompiledContract().Abi.Methods {
 			// Any non-constant method should be tracked as a state changing method.
@@ -434,7 +438,6 @@ func (fw *FuzzerWorker) testNextCallSequence() ([]ShrinkCallSequenceRequest, err
 		// debug: print execution trace
 		// hash := utils.MessageToTransaction(latestCallSequenceElement.Call.ToCoreMessage()).Hash()
 		// fmt.Println(hash, fw.executionTracer.GetTrace(hash))
-		// fmt.Println(fw.executionTracer.GetTrace(hash).String())
 
 		// If we have shrink requests, it means we violated a test, so we quit at this point
 		return len(shrinkCallSequenceRequests) > 0, nil

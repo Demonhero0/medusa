@@ -91,6 +91,13 @@ func GetDefaultProjectConfig(platform string) (*ProjectConfig, error) {
 						"optimize_",
 					},
 				},
+				HelperContract: HelperContractConfig{
+					Enabled:                 true,
+					EnabledContractCall:     true,
+					ContractCallProbability: 0.5,
+					EnabledInternalCall:     true,
+					InternalCallProbability: 0.05,
+				},
 			},
 			TestChainConfig: *chainConfig,
 		},

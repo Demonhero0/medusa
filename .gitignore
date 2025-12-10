@@ -29,3 +29,7 @@ docs/book
 
 # Build results
 result
+
+# tmp files
+tmp_*
+

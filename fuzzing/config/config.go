@@ -229,6 +229,9 @@ type TestingConfig struct {
 	// ExcludeFunctionSignatures is a list of function signatures that will be excluded from call sequences.
 	// The signatures should specify the contract name and signature in the ABI format like `Contract.func(uint256,bytes32)`.
 	ExcludeFunctionSignatures []string `json:"excludeFunctionSignatures"`
+
+	// Helper Contract Config handles the case that sending transaction by a helper contract
+	HelperContract HelperContractConfig `json:"helperContractConfig"`
 }
 
 // Validate validates that the TestingConfig meets certain requirements.
@@ -481,4 +484,12 @@ func (p *ProjectConfig) Validate() error {
 	}
 
 	return nil
+}
+
+type HelperContractConfig struct {
+	Enabled                 bool    `json:"enabled"`
+	EnabledContractCall     bool    `json:"enabledContractCall"`
+	ContractCallProbability float32 `json:"contractCallProbability"`
+	EnabledInternalCall     bool    `json:"enabledInternalCall"`
+	InternalCallProbability float32 `json:"InternalCallProbability"`
 }

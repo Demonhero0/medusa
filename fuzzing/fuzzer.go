@@ -212,7 +212,7 @@ func NewFuzzer(config config.ProjectConfig) (*Fuzzer, error) {
 	fuzzer.baseValueSet.AddAddress(fuzzer.deployer)
 	for _, sender := range fuzzer.senders {
 		fuzzer.baseValueSet.AddAddress(sender)
-	} 
+	}
 
 	// init on-chain target contracts
 	for _, target := range config.Fuzzing.TargetContracts {
@@ -960,6 +960,21 @@ func (f *Fuzzer) Start() error {
 		return err
 	}
 	f.logger.Info("Finished setting up test chain")
+
+	// Set up helper contract
+	if f.config.Fuzzing.Testing.HelperContract.Enabled {
+		trace, err, helperContractAddress := setupFuzzHelperContract(f, baseTestChain)
+		if err != nil {
+			if trace != nil {
+				f.logger.Error("Failed to set up helper contract", err, errors.New(trace.Log().ColorString()))
+			} else {
+				f.logger.Error("Failed to set up helper contract", err)
+			}
+			return err
+		}
+		f.baseValueSet.AddAddress(helperContractAddress)
+		f.logger.Info("Setting up helper contract at address ", helperContractAddress.Hex())
+	}
 
 	// Create and initialize the corpus
 	f.logger.Info("Creating corpus...")
