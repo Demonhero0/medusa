@@ -16,8 +16,15 @@ import (
 	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa/chain"
 	"github.com/crytic/medusa/fuzzing/calls"
+	"github.com/crytic/medusa/fuzzing/config"
 	"github.com/crytic/medusa/fuzzing/contracts"
 	"github.com/crytic/medusa/fuzzing/coverage"
+	branchdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/branchdistance"
+	cmpdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/cmpdistance"
+	codecoverage "github.com/crytic/medusa/fuzzing/fitnessmetrics/codecoverage"
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/dataflow"
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/storagewrite"
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/tokenflow"
 	"github.com/crytic/medusa/logging"
 	"github.com/crytic/medusa/utils"
 	"github.com/crytic/medusa/utils/randomutils"
@@ -59,11 +66,35 @@ type Corpus struct {
 
 	// logger describes the Corpus's log object that can be used to log important events
 	logger *logging.Logger
+
+	// fuzzingConfig describes the configuration for fuzzing.
+	fuzzingConfig *config.FuzzingConfig
+
+	//codeCoverageMaps describes the total instructions being executed across all corpus call sequences
+	codeCoverageMaps *codecoverage.CoverageMaps
+
+	// branchCoverageMaps describes the total branches known to be achieved across all corpus call sequences
+	branchCoverageMaps *coverage.CoverageMaps
+
+	// cmpDistanceMaps describes the closest distance to trigger unseen condidions in comparison opeartions
+	cmpDistanceMaps *cmpdistance.CmpDistanceMaps
+
+	// branchDistanceMaps describes the closest distance to trigger unseen branches
+	branchDistanceMaps *branchdistance.BranchDistanceMaps
+
+	// dataflowMaps describes the triggered dataflw
+	dataflowMaps *dataflow.DataflowSet
+
+	// storageWriteMaps describes the storage slots being written
+	storageWriteMaps *storagewrite.StorageWriteSet
+
+	// tokenflowMaps describes the token flow being triggered
+	tokenflowMaps *tokenflow.TokenflowSet
 }
 
 // NewCorpus initializes a new Corpus object, reading artifacts from the provided directory and preparing in-memory
 // state required for fuzzing. If the directory refers to an empty path, artifacts will not be persistently stored.
-func NewCorpus(corpusDirectory string) (*Corpus, error) {
+func NewCorpus(corpusDirectory string, fuzzingConfig *config.FuzzingConfig) (*Corpus, error) {
 	var err error
 	corpus := &Corpus{
 		storageDirectory:        corpusDirectory,
@@ -72,6 +103,16 @@ func NewCorpus(corpusDirectory string) (*Corpus, error) {
 		testResultSequenceFiles: newCorpusDirectory[calls.CallSequence](""),
 		unexecutedCallSequences: make([]calls.CallSequence, 0),
 		logger:                  logging.GlobalLogger.NewSubLogger("module", "corpus"),
+
+		// for fitness metrics
+		fuzzingConfig:      fuzzingConfig,
+		codeCoverageMaps:   codecoverage.NewCoverageMaps(),
+		branchCoverageMaps: coverage.NewCoverageMaps(),
+		cmpDistanceMaps:    cmpdistance.NewCmpDistanceMaps(),
+		branchDistanceMaps: branchdistance.NewBranchDistanceMaps(),
+		dataflowMaps:       dataflow.NewDataflowSet(),
+		storageWriteMaps:   storagewrite.NewStorageWriteSet(),
+		tokenflowMaps:      tokenflow.NewTokenflowSet(),
 	}
 
 	// If we have a corpus directory set, parse our call sequences.
@@ -583,4 +624,139 @@ func (c *Corpus) PruneSequences(ctx context.Context, chain *chain.TestChain) (in
 
 	c.mutationTargetSequenceChooser.RemoveChoices(toRemove)
 	return len(toRemove), nil
+}
+
+// CheckSequenceMetricAndUpdate checks if the most recent call executed in the provided call sequence achieved
+// any better metric the Corpus did not with any of its call sequences. If it did, the call sequence is added
+// to the corpus and the Corpus global metric are updated accordingly.
+// Returns an error if one occurs.
+func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, mutationChooserWeight *big.Int, flushImmediately bool) error {
+	// If we have coverage-guided fuzzing disabled or no calls in our sequence, there is nothing to do.
+	if len(callSequence) == 0 {
+		return nil
+	}
+
+	// Obtain our coverage maps for our last call.
+	lastCall := callSequence[len(callSequence)-1]
+	lastCallChainReference := lastCall.ChainReference
+	lastMessageResult := lastCallChainReference.Block.MessageResults[lastCallChainReference.TransactionIndex]
+
+	updated := false
+
+	if c.fuzzingConfig.UseCodeCoverageTracing() {
+		codeCoverageMaps := codecoverage.GetCoverageTracerResults(lastMessageResult)
+		coverageUpdated, err := c.codeCoverageMaps.Update(codeCoverageMaps)
+		if err != nil {
+			return err
+		}
+		if c.fuzzingConfig.FitnessMetricConfig.CodeCoverageEnabled {
+			updated = coverageUpdated || updated
+		}
+	}
+
+	// Merge the coverage maps into our total coverage maps and check if we had an update.
+	if c.fuzzingConfig.UseBranchCoverageTracing() {
+		coverageMaps := coverage.GetCoverageTracerResults(lastMessageResult)
+		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
+		//coverage.RemoveCoverageTracerResults(lastMessageResult)
+		coverageUpdated, err := c.branchCoverageMaps.Update(coverageMaps)
+		if err != nil {
+			return err
+		}
+		if c.fuzzingConfig.FitnessMetricConfig.BranchCoverageEnabled {
+			updated = coverageUpdated || updated
+		}
+	}
+
+	if c.fuzzingConfig.UseBranchDistanceTracing() {
+		branchdistanceMaps := branchdistance.GetBranchDistanceTracerResults(lastMessageResult)
+		branchDistanceUpdated, err := c.branchDistanceMaps.Update(branchdistanceMaps)
+		if err != nil {
+			return err
+		}
+		if c.fuzzingConfig.FitnessMetricConfig.BranchDistanceEnabled {
+			updated = branchDistanceUpdated || updated
+		}
+	}
+
+	if c.fuzzingConfig.UseCmpDistanceTracing() {
+		cmpDistanceMaps := cmpdistance.GetCmpDistanceTracerResults(lastMessageResult)
+		cmpDistanceUpdated, err := c.cmpDistanceMaps.Update(cmpDistanceMaps)
+		if err != nil {
+			return err
+		}
+		if c.fuzzingConfig.FitnessMetricConfig.CmpDistanceEnabled {
+			updated = cmpDistanceUpdated || updated
+		}
+	}
+
+	if c.fuzzingConfig.UseDataflowTracing() {
+		dataflowMaps := dataflow.GetDataflowTracerResults(lastMessageResult)
+		dataflowUpdated, err := c.dataflowMaps.Update(dataflowMaps)
+		if err != nil {
+			return err
+		}
+		if c.fuzzingConfig.FitnessMetricConfig.DataflowEnabled {
+			updated = dataflowUpdated || updated
+		}
+	}
+
+	if c.fuzzingConfig.UseStorageWriteTracing() {
+		storageWriteMaps := storagewrite.GetStorageWriteTracerResults(lastMessageResult)
+		storageWriteUpdated, err := c.storageWriteMaps.Update(storageWriteMaps)
+		if err != nil {
+			return err
+		}
+		if c.fuzzingConfig.FitnessMetricConfig.StorageWriteEnabled {
+			updated = storageWriteUpdated || updated
+		}
+	}
+
+	if c.fuzzingConfig.UseTokenflowTracing() {
+		tokenflowMaps := tokenflow.GetTokenflowTracerResults(lastMessageResult)
+		tokenflowUpdated, err := c.tokenflowMaps.Update(tokenflowMaps)
+		if err != nil {
+			return err
+		}
+		if c.fuzzingConfig.FitnessMetricConfig.TokenflowEnabled {
+			updated = tokenflowUpdated || updated
+		}
+	}
+
+	// If we had an increase in non-reverted or reverted coverage, we save the sequence.
+	// Note: We only want to save the sequence once. We're most interested if it can be used for mutations first.
+	if updated {
+		// If we achieved new coverage, save this sequence for mutation purposes.
+		err := c.addCallSequence(c.callSequenceFiles, callSequence, true, mutationChooserWeight, flushImmediately)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// CoverageMaps exposes coverage details for all call sequences known to the corpus.
+func (c *Corpus) CodeCoverageMaps() *codecoverage.CoverageMaps {
+	return c.codeCoverageMaps
+}
+
+func (c *Corpus) DataflowSet() *dataflow.DataflowSet {
+	return c.dataflowMaps
+}
+
+func (c *Corpus) StorageWriteMaps() *storagewrite.StorageWriteSet {
+	return c.storageWriteMaps
+}
+
+func (c *Corpus) TokenflowMaps() *tokenflow.TokenflowSet {
+	return c.tokenflowMaps
+}
+
+func (c *Corpus) BranchDistanceMaps() *branchdistance.BranchDistanceMaps {
+	return c.branchDistanceMaps
+}
+
+func (c *Corpus) CmpDistanceMaps() *cmpdistance.CmpDistanceMaps {
+	return c.cmpDistanceMaps
 }

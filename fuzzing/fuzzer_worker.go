@@ -18,6 +18,13 @@ import (
 	"github.com/crytic/medusa/fuzzing/valuegeneration"
 	"github.com/crytic/medusa/utils"
 	"golang.org/x/exp/maps"
+
+	branchdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/branchdistance"
+	cmpdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/cmpdistance"
+	codecoverage "github.com/crytic/medusa/fuzzing/fitnessmetrics/codecoverage"
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/dataflow"
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/storagewrite"
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/tokenflow"
 )
 
 // FuzzerWorker describes a single thread worker utilizing its own go-ethereum test node to run property tests against
@@ -72,6 +79,24 @@ type FuzzerWorker struct {
 
 	// executionTracer is used to trace EVM execution for each call in a call sequence.
 	executionTracer *executiontracer.ExecutionTracer
+
+	// codeCoverageTracer describes the tracer used to collect code coverage maps during fuzzing campaigns.
+	codeCoverageTracer *codecoverage.CoverageTracer
+
+	// cmpDistanceTracer is used to collect comparison operation data during fuzzing.
+	cmpDistanceTracer *cmpdistance.CmpDistanceTracer
+
+	// branchDistanceTracer is used to collect branch distance data during fuzzing.
+	branchDistanceTracer *branchdistance.BranchDistanceTracer
+
+	// dataFlowTracer is used to collect the data flow during fuzzing.
+	dataFlowTracer *dataflow.DataflowTracer
+
+	// storageWriteTracer is used to record the storage slots being writen during fuzzing.
+	storageWriteTracer *storagewrite.StorageWriteTracer
+
+	// tokenflowTracer is used to record the token flow being triggered during fuzzing.
+	tokenflowTracer *tokenflow.TokenflowTracer
 }
 
 // newFuzzerWorker creates a new FuzzerWorker, assigning it the provided worker index/id and associating it to the
@@ -409,7 +434,14 @@ func (fw *FuzzerWorker) testNextCallSequence() ([]ShrinkCallSequenceRequest, err
 
 		// Check for updates to coverage and corpus.
 		// If we detect coverage changes, add this sequence with weight as 1 + sequences tested (to avoid zero weights)
-		err = fw.fuzzer.corpus.CheckSequenceCoverageAndUpdate(currentlyExecutedSequence, fw.getNewCorpusCallSequenceWeight(), true)
+		// err = fw.fuzzer.corpus.CheckSequenceCoverageAndUpdate(currentlyExecutedSequence, fw.getNewCorpusCallSequenceWeight(), true)
+		// if err != nil {
+		// 	return true, err
+		// }
+
+		// For fitness metrics, checking for updates to various fitness mertics and corpus
+		// If we detect some fitness metrics changes, add this sequence with weight as 1 + sequences tested (to avoid zero weights)
+		err = fw.fuzzer.corpus.CheckSequenceMetricAndUpdate(currentlyExecutedSequence, fw.getNewCorpusCallSequenceWeight(), true)
 		if err != nil {
 			return true, err
 		}
@@ -512,7 +544,14 @@ func (fw *FuzzerWorker) testShrunkenCallSequence(possibleShrunkSequence calls.Ca
 	executionCheckFunc := func(currentlyExecutedSequence calls.CallSequence) (bool, error) {
 		// Check for updates to coverage and corpus (using only the section of the sequence we tested so far).
 		// If we detect coverage changes, add this sequence.
-		seqErr := fw.fuzzer.corpus.CheckSequenceCoverageAndUpdate(currentlyExecutedSequence, fw.getNewCorpusCallSequenceWeight(), true)
+		// seqErr := fw.fuzzer.corpus.CheckSequenceCoverageAndUpdate(currentlyExecutedSequence, fw.getNewCorpusCallSequenceWeight(), true)
+		// if seqErr != nil {
+		// 	return true, seqErr
+		// }
+
+		// For fitness metrics, checking for updates to various fitness mertics and corpus (using only the section of the sequence we tested so far).
+		// If we detect some fitness metrics changes, add this sequence with weight as 1 + sequences tested (to avoid zero weights)
+		seqErr := fw.fuzzer.corpus.CheckSequenceMetricAndUpdate(currentlyExecutedSequence, fw.getNewCorpusCallSequenceWeight(), true)
 		if seqErr != nil {
 			return true, seqErr
 		}
@@ -716,9 +755,8 @@ func (fw *FuzzerWorker) run(baseTestChain *chain.TestChain) (bool, error) {
 		// Subcribe our chain event handler that detects contracts that were not deployed during the lifetime of the TestChain, but exist on chain.
 		initializedChain.Events.ContractDiscoveryEventEmitter.Subscribe(fw.onChainContractDiscoveryEvent)
 
-		// debug: tracing execution trace
-		// fw.executionTracer = executiontracer.NewExecutionTracer(fw.fuzzer.contractDefinitions, initializedChain, config.VeryVeryVerbose)
-		// initializedChain.AddTracer(fw.executionTracer.NativeTracer(), true, false)
+		// attach tracers to the chain
+		fw.attachTracersToChain(initializedChain)
 		return nil
 	})
 
@@ -741,13 +779,15 @@ func (fw *FuzzerWorker) run(baseTestChain *chain.TestChain) (bool, error) {
 		}
 	}
 
-	// Freeze a set of `fw.deployedContracts`'s keys so that we have a set of addresses present in baseTestChain.
-	// Feed this set to the coverage tracer.
-	initialContractsSet := make(map[common.Address]struct{}, len(fw.deployedContracts))
-	for addr := range fw.deployedContracts {
-		initialContractsSet[addr] = struct{}{}
+	if fw.fuzzer.config.Fuzzing.CoverageEnabled {
+		// Freeze a set of `fw.deployedContracts`'s keys so that we have a set of addresses present in baseTestChain.
+		// Feed this set to the coverage tracer.
+		initialContractsSet := make(map[common.Address]struct{}, len(fw.deployedContracts))
+		for addr := range fw.deployedContracts {
+			initialContractsSet[addr] = struct{}{}
+		}
+		fw.coverageTracer.SetInitialContractsSet(&initialContractsSet)
 	}
-	fw.coverageTracer.SetInitialContractsSet(&initialContractsSet)
 
 	// If we encountered an error during cloning, return it.
 	if err != nil {

@@ -16,7 +16,7 @@ import (
 // getMockSimpleCorpus creates a mock corpus with numEntries callSequenceFiles for testing
 func getMockSimpleCorpus(minSequences int, maxSequences, minBlocks int, maxBlocks int) (*Corpus, error) {
 	// Create a new corpus
-	corpus, err := NewCorpus("corpus")
+	corpus, err := NewCorpus("corpus", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +106,11 @@ func TestCorpusReadWrite(t *testing.T) {
 		assert.EqualValues(t, len(corpus.callSequenceFiles.files), len(matches))
 
 		// Wipe corpus clean so that you can now read it in from disk
-		corpus, err = NewCorpus("corpus")
+		corpus, err = NewCorpus("corpus", nil)
 		assert.NoError(t, err)
 
 		// Create a new corpus object and read our previously read artifacts.
-		corpus, err = NewCorpus(corpus.storageDirectory)
+		corpus, err = NewCorpus(corpus.storageDirectory, nil)
 		assert.NoError(t, err)
 	})
 }

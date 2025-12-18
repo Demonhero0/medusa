@@ -978,7 +978,7 @@ func (f *Fuzzer) Start() error {
 
 	// Create and initialize the corpus
 	f.logger.Info("Creating corpus...")
-	f.corpus, err = corpus.NewCorpus(f.config.Fuzzing.CorpusDirectory)
+	f.corpus, err = corpus.NewCorpus(f.config.Fuzzing.CorpusDirectory, &f.config.Fuzzing)
 	if err != nil {
 		f.logger.Error("Failed to create the corpus", err)
 		return err
@@ -1200,6 +1200,29 @@ func (f *Fuzzer) printMetricsLoop() {
 		logBuffer.Append(", corpus: ", colors.Bold, fmt.Sprintf("%d", f.corpus.ActiveMutableSequenceCount()), colors.Reset)
 		logBuffer.Append(", failures: ", colors.Bold, fmt.Sprintf("%d/%d", failedSequences, sequencesTested), colors.Reset)
 		logBuffer.Append(", gas/s: ", colors.Bold, fmt.Sprintf("%d", uint64(float64(new(big.Int).Sub(gasUsed, lastGasUsed).Uint64())/secondsSinceLastUpdate)), colors.Reset)
+
+		// For fitness metrics
+		if f.config.Fuzzing.UseCodeCoverageTracing() {
+			c, t := f.corpus.CodeCoverageMaps().TotalCodeCoverage([]common.Address{})
+			rate := float64(c) / float64(t)
+			logBuffer.Append(", code coverage: ", colors.Bold, fmt.Sprintf("%v (%.2f)", c, rate), colors.Reset)
+		}
+
+		if f.config.Fuzzing.UseDataflowTracing() {
+			c := f.corpus.DataflowSet().TotalDataflowCount()
+			logBuffer.Append(", dataflow: ", colors.Bold, fmt.Sprintf("%d", c), colors.Reset)
+		}
+
+		if f.config.Fuzzing.UseStorageWriteTracing() {
+			c := f.corpus.StorageWriteMaps().TotalStorageWriteCount()
+			logBuffer.Append(", storage writes: ", colors.Bold, fmt.Sprintf("%d", c), colors.Reset)
+		}
+
+		if f.config.Fuzzing.UseTokenflowTracing() {
+			c := f.corpus.TokenflowMaps().TotalTokenflowCount(true)
+			logBuffer.Append(", tokenflow: ", colors.Bold, fmt.Sprintf("%v", c), colors.Reset)
+		}
+
 		if f.logger.Level() <= zerolog.DebugLevel {
 			logBuffer.Append(", shrinking: ", colors.Bold, fmt.Sprintf("%v", workersShrinking), colors.Reset)
 			logBuffer.Append(", mem: ", colors.Bold, fmt.Sprintf("%v/%v MB", memoryUsedMB, memoryTotalMB), colors.Reset)

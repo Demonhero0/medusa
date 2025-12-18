@@ -115,6 +115,12 @@ type FuzzingConfig struct {
 
 	// TestChainConfig represents the chain.TestChain config to use when initializing a chain.
 	TestChainConfig config.TestChainConfig `json:"chainConfig"`
+
+	// For fitness metrics guiding
+	FitnessMetricConfig FitnessMetricConfig `json:"fitnessMetricConfig"`
+
+	// For fitness metrics recording
+	MetricRecordConfig MetricRecordConfig `json:"metricRecordConfig"`
 }
 
 // ContractBalance wraps big.Int to provide custom JSON marshaling/unmarshaling
@@ -492,4 +498,62 @@ type HelperContractConfig struct {
 	ContractCallProbability float32 `json:"contractCallProbability"`
 	EnabledInternalCall     bool    `json:"enabledInternalCall"`
 	InternalCallProbability float32 `json:"InternalCallProbability"`
+}
+
+type FitnessMetricConfig struct {
+	CodeCoverageEnabled   bool `json:"codeCoverageEnabled"`
+	BranchCoverageEnabled bool `json:"branchCoverageEnabled"`
+
+	DataflowEnabled     bool `json:"dataflowEnabled"`
+	StorageWriteEnabled bool `json:"storageWriteEnabled"`
+	TokenflowEnabled    bool `json:"tokenflowEnabled"`
+
+	StateEnabled bool `json:"stateEnabled"`
+	SlotEnabled  bool `json:"slotEnabled"`
+
+	BranchDistanceEnabled bool `json:"branchDistanceEnabled"`
+	CmpDistanceEnabled    bool `json:"cmpDistanceEnabled"`
+}
+
+type MetricRecordConfig struct {
+	CodeCoverageEnabled   bool `json:"codeCoverageEnabled"`
+	BranchCoverageEnabled bool `json:"branchCoverageEnabled"`
+
+	DataflowEnabled     bool `json:"dataflowEnabled"`
+	StorageWriteEnabled bool `json:"storageWriteEnabled"`
+	TokenflowEnabled    bool `json:"tokenflowEnabled"`
+
+	StateEnabled bool `json:"stateEnabled"`
+	SlotEnabled  bool `json:"slotEnabled"`
+
+	BranchDistanceEnabled bool `json:"branchDistanceEnabled"`
+	CmpDistanceEnabled    bool `json:"cmpDistanceEnabled"`
+}
+
+func (f *FuzzingConfig) UseCodeCoverageTracing() bool {
+	return f.FitnessMetricConfig.CodeCoverageEnabled || f.MetricRecordConfig.CodeCoverageEnabled
+}
+
+func (f *FuzzingConfig) UseBranchCoverageTracing() bool {
+	return f.FitnessMetricConfig.BranchCoverageEnabled || f.MetricRecordConfig.BranchCoverageEnabled
+}
+
+func (f *FuzzingConfig) UseDataflowTracing() bool {
+	return f.FitnessMetricConfig.DataflowEnabled || f.MetricRecordConfig.DataflowEnabled
+}
+
+func (f *FuzzingConfig) UseStorageWriteTracing() bool {
+	return f.FitnessMetricConfig.StorageWriteEnabled || f.MetricRecordConfig.StorageWriteEnabled
+}
+
+func (f *FuzzingConfig) UseTokenflowTracing() bool {
+	return f.FitnessMetricConfig.TokenflowEnabled || f.MetricRecordConfig.TokenflowEnabled
+}
+
+func (f *FuzzingConfig) UseBranchDistanceTracing() bool {
+	return f.FitnessMetricConfig.BranchDistanceEnabled || f.MetricRecordConfig.BranchDistanceEnabled
+}
+
+func (f *FuzzingConfig) UseCmpDistanceTracing() bool {
+	return f.FitnessMetricConfig.CmpDistanceEnabled || f.MetricRecordConfig.CmpDistanceEnabled
 }
