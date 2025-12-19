@@ -484,9 +484,13 @@ func (f *Fuzzer) createTestChain() (*chain.TestChain, error) {
 
 	// Fund all of our sender addresses in the genesis block with 2^256-1 ETH equivalent
 	initBalance := new(big.Int).Sub(new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), big.NewInt(1))
-	for _, sender := range f.senders {
-		genesisAlloc[sender] = types.Account{
-			Balance: new(big.Int).Set(initBalance),
+	for index, sender := range f.senders {
+		// Fund our sender addresses with config
+		if index < len(f.config.Fuzzing.SenderAddresses) {
+			balance := new(big.Int).Set(f.config.Fuzzing.SenderAddressBalances[index])
+			genesisAlloc[sender] = types.Account{
+				Balance: new(big.Int).Set(balance),
+			}
 		}
 	}
 

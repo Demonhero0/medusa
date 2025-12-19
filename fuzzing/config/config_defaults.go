@@ -1,6 +1,9 @@
 package config
 
 import (
+	"math/big"
+
+	"github.com/crytic/medusa-geth/accounts/abi"
 	testChainConfig "github.com/crytic/medusa/chain/config"
 	"github.com/crytic/medusa/compilation"
 	"github.com/crytic/medusa/compilation/types"
@@ -58,6 +61,11 @@ func GetDefaultProjectConfig(platform string) (*ProjectConfig, error) {
 				"0x10000",
 				"0x20000",
 				"0x30000",
+			},
+			SenderAddressBalances: []*big.Int{
+				new(big.Int).Div(abi.MaxInt256, big.NewInt(2)),
+				new(big.Int).Div(abi.MaxInt256, big.NewInt(2)),
+				new(big.Int).Div(abi.MaxInt256, big.NewInt(2)),
 			},
 			DeployerAddress:        "0x30000",
 			MaxBlockNumberDelay:    60480,

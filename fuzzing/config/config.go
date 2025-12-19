@@ -99,6 +99,9 @@ type FuzzingConfig struct {
 	// campaigns.
 	SenderAddresses []string `json:"senderAddresses"`
 
+	// SenderAddressesBalances describe the ether balance of senders in SenderAddresses
+	SenderAddressBalances []*big.Int `json:"senderAddressBalances"`
+
 	// MaxBlockNumberDelay describes the maximum distance in block numbers the fuzzer will use when generating blocks
 	// compared to the previous.
 	MaxBlockNumberDelay uint64 `json:"blockNumberDelayMax"`
