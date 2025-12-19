@@ -652,13 +652,13 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 		if c.fuzzingConfig.FitnessMetricConfig.CodeCoverageEnabled {
 			updated = coverageUpdated || updated
 		}
+		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
+		codecoverage.RemoveCoverageTracerResults(lastMessageResult)
 	}
 
 	// Merge the coverage maps into our total coverage maps and check if we had an update.
 	if c.fuzzingConfig.UseBranchCoverageTracing() {
 		coverageMaps := coverage.GetCoverageTracerResults(lastMessageResult)
-		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		//coverage.RemoveCoverageTracerResults(lastMessageResult)
 		coverageUpdated, err := c.branchCoverageMaps.Update(coverageMaps)
 		if err != nil {
 			return err
@@ -666,6 +666,8 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 		if c.fuzzingConfig.FitnessMetricConfig.BranchCoverageEnabled {
 			updated = coverageUpdated || updated
 		}
+		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
+		coverage.RemoveCoverageTracerResults(lastMessageResult)
 	}
 
 	if c.fuzzingConfig.UseBranchDistanceTracing() {
@@ -677,6 +679,8 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 		if c.fuzzingConfig.FitnessMetricConfig.BranchDistanceEnabled {
 			updated = branchDistanceUpdated || updated
 		}
+		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
+		branchdistance.RemoveBranchDistanceTracerResults(lastMessageResult)
 	}
 
 	if c.fuzzingConfig.UseCmpDistanceTracing() {
@@ -688,6 +692,8 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 		if c.fuzzingConfig.FitnessMetricConfig.CmpDistanceEnabled {
 			updated = cmpDistanceUpdated || updated
 		}
+		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
+		cmpdistance.RemoveCmpDistanceTracerResults(lastMessageResult)
 	}
 
 	if c.fuzzingConfig.UseDataflowTracing() {
@@ -699,6 +705,8 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 		if c.fuzzingConfig.FitnessMetricConfig.DataflowEnabled {
 			updated = dataflowUpdated || updated
 		}
+		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
+		dataflow.RemoveDataflowTracerResults(lastMessageResult)
 	}
 
 	if c.fuzzingConfig.UseStorageWriteTracing() {
@@ -710,6 +718,8 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 		if c.fuzzingConfig.FitnessMetricConfig.StorageWriteEnabled {
 			updated = storageWriteUpdated || updated
 		}
+		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
+		storagewrite.RemoveStorageWriteTracerResults(lastMessageResult)
 	}
 
 	if c.fuzzingConfig.UseTokenflowTracing() {
@@ -721,6 +731,8 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 		if c.fuzzingConfig.FitnessMetricConfig.TokenflowEnabled {
 			updated = tokenflowUpdated || updated
 		}
+		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
+		tokenflow.RemoveTokenflowTracerResults(lastMessageResult)
 	}
 
 	// If we had an increase in non-reverted or reverted coverage, we save the sequence.
