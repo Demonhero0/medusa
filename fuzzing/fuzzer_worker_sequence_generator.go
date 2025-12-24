@@ -269,28 +269,30 @@ func (g *CallSequenceGenerator) PopSequenceElement() (*calls.CallSequenceElement
 		element.Call.FillFromTestChainProperties(g.worker.chain)
 	}
 
-	// set internal call in helpercontract if enabled
-	if g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.EnabledInternalCall && *element.Call.To != FuzzHelperContractAddress {
-		slot0 := g.worker.chain.State().GetState(FuzzHelperContractAddress, common.HexToHash("0x0"))
-		// if slot0 is 0, always use set an internal call in helper contract
-		// else, use probability to determine if we should reset internal call in helper contract
-		if slot0.Big().Cmp(big.NewInt(0)) == 0 {
-			element, _ = ConvertToInternalCall(element)
-		} else if g.worker.randomProvider.Float32() < g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.InternalCallProbability {
-			element, _ = ConvertToInternalCall(element)
-		}
-	}
-
-	// send transaction with helper contract if enabled and with probability
-	if g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.EnabledContractCall {
-		if *element.Call.To != FuzzHelperContractAddress && g.worker.randomProvider.Float32() < g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.ContractCallProbability {
-			element, _ = ConvertToContractCall(element)
+	if g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.Enabled {
+		// set internal call in helpercontract if enabled
+		if g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.EnabledInternalCall && *element.Call.To != FuzzHelperContractAddress {
+			slot0 := g.worker.chain.State().GetState(FuzzHelperContractAddress, common.HexToHash("0x0"))
+			// if slot0 is 0, always use set an internal call in helper contract
+			// else, use probability to determine if we should reset internal call in helper contract
+			if slot0.Big().Cmp(big.NewInt(0)) == 0 {
+				element, _ = ConvertToInternalCall(element)
+			} else if g.worker.randomProvider.Float32() < g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.InternalCallProbability {
+				element, _ = ConvertToInternalCall(element)
+			}
 		}
 
-		// Disable nonce and EOA checks if requested by config
-		if g.worker.fuzzer.config.Fuzzing.TestChainConfig.SkipAccountChecks {
-			element.Call.SkipFromEOACheck = true
-			element.Call.SkipNonceChecks = true
+		// send transaction with helper contract if enabled and with probability
+		if g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.EnabledContractCall {
+			if *element.Call.To != FuzzHelperContractAddress && g.worker.randomProvider.Float32() < g.worker.fuzzer.config.Fuzzing.Testing.HelperContract.ContractCallProbability {
+				element, _ = ConvertToContractCall(element)
+			}
+
+			// Disable nonce and EOA checks if requested by config
+			if g.worker.fuzzer.config.Fuzzing.TestChainConfig.SkipAccountChecks {
+				element.Call.SkipFromEOACheck = true
+				element.Call.SkipNonceChecks = true
+			}
 		}
 	}
 
