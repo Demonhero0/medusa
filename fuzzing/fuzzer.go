@@ -243,7 +243,12 @@ func NewFuzzer(config config.ProjectConfig) (*Fuzzer, error) {
 		// Compile the targets specified in the compilation config
 		fuzzer.logger.Info("Compiling targets with ", colors.Bold, fuzzer.config.Compilation.Platform, colors.Reset)
 		start := time.Now()
-		compilations, _, err := (*fuzzer.config.Compilation).Compile()
+		compilations, out, err := (*fuzzer.config.Compilation).Compile()
+		if len(out) > 0 {
+			fuzzer.logger.Info("Compilation output: compiling new artifacts")
+		} else {
+			fuzzer.logger.Info("Compilation output: using existing artifacts")
+		}
 		if err != nil {
 			fuzzer.logger.Error("Failed to compile target", err)
 			return nil, err

@@ -30,6 +30,9 @@ type CryticCompilationConfig struct {
 
 	// Args are additional arguments that can be provided to `crytic-compile`
 	Args []string `json:"args"`
+
+	// Force compile
+	Force bool `json:"force"`
 }
 
 // Platform returns the platform type
@@ -96,43 +99,54 @@ func (c *CryticCompilationConfig) Compile() ([]types.Compilation, string, error)
 	if exportDirectory == "" {
 		exportDirectory = "crytic-export"
 	}
-	err := utils.DeleteDirectory(exportDirectory)
-	if err != nil {
-		return nil, "", fmt.Errorf("could not delete crytic-compile's export directory prior to compilation, error: %v", err)
-	}
 
-	// Validate args to make sure --export-format and --export-dir are not specified
-	err = c.validateArgs()
-	if err != nil {
-		return nil, "", err
-	}
+	var (
+		err error
+		out []byte
+	)
 
-	// Fetch the arguments to invoke crytic-compile with
-	args, err := c.getArgs()
-	if err != nil {
-		return nil, "", err
-	}
+	if _, err := os.Stat(exportDirectory); !os.IsNotExist(err) && !c.Force {
 
-	// Get main command and set working directory
-	cmd := exec.Command("crytic-compile", args...)
-	logging.GlobalLogger.Info("Running command:\n", cmd.String())
+	} else {
 
-	// Install a specific `solc` version if requested in the config
-	if c.SolcVersion != "" {
-		out, err := exec.Command("solc-select", "install", c.SolcVersion).CombinedOutput()
+		err := utils.DeleteDirectory(exportDirectory)
 		if err != nil {
-			return nil, "", fmt.Errorf("error while executing `solc-select install`:\nOUTPUT:\n%s\nERROR: %s\n", string(out), err.Error())
+			return nil, "", fmt.Errorf("could not delete crytic-compile's export directory prior to compilation, error: %v", err)
 		}
-		out, err = exec.Command("solc-select", "use", c.SolcVersion).CombinedOutput()
-		if err != nil {
-			return nil, "", fmt.Errorf("error while executing `solc-select use`:\nOUTPUT:\n%s\nERROR: %s\n", string(out), err.Error())
-		}
-	}
 
-	// Run crytic-compile to compile and export our compilation artifacts.
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil, "", fmt.Errorf("error while executing crytic-compile:\nOUTPUT:\n%s\nERROR: %s\n", string(out), err.Error())
+		// Validate args to make sure --export-format and --export-dir are not specified
+		err = c.validateArgs()
+		if err != nil {
+			return nil, "", err
+		}
+
+		// Fetch the arguments to invoke crytic-compile with
+		args, err := c.getArgs()
+		if err != nil {
+			return nil, "", err
+		}
+
+		// Get main command and set working directory
+		cmd := exec.Command("crytic-compile", args...)
+		logging.GlobalLogger.Info("Running command:\n", cmd.String())
+
+		// Install a specific `solc` version if requested in the config
+		if c.SolcVersion != "" {
+			out, err := exec.Command("solc-select", "install", c.SolcVersion).CombinedOutput()
+			if err != nil {
+				return nil, "", fmt.Errorf("error while executing `solc-select install`:\nOUTPUT:\n%s\nERROR: %s\n", string(out), err.Error())
+			}
+			out, err = exec.Command("solc-select", "use", c.SolcVersion).CombinedOutput()
+			if err != nil {
+				return nil, "", fmt.Errorf("error while executing `solc-select use`:\nOUTPUT:\n%s\nERROR: %s\n", string(out), err.Error())
+			}
+		}
+
+		// Run crytic-compile to compile and export our compilation artifacts.
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			return nil, "", fmt.Errorf("error while executing crytic-compile:\nOUTPUT:\n%s\nERROR: %s\n", string(out), err.Error())
+		}
 	}
 
 	// Find compilation artifacts in the export directory
