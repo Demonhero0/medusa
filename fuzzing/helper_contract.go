@@ -146,6 +146,8 @@ func init() {
 		InitBytecode:    fuzzHelperBytecode,
 		RuntimeBytecode: fuzzHelperDeployedBytecode,
 	}, nil)
+
+	FuzzHelperContractAddress = common.HexToAddress("0x")
 }
 
 func setupFuzzHelperContract(fuzzer *Fuzzer, testChain *chain.TestChain) (*executiontracer.ExecutionTrace, error, common.Address) {

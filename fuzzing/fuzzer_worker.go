@@ -11,6 +11,7 @@ import (
 
 	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa/chain"
+	"github.com/crytic/medusa/fuzzing/bugdetector"
 	"github.com/crytic/medusa/fuzzing/calls"
 	fuzzerTypes "github.com/crytic/medusa/fuzzing/contracts"
 	"github.com/crytic/medusa/fuzzing/coverage"
@@ -97,6 +98,9 @@ type FuzzerWorker struct {
 
 	// tokenflowTracer is used to record the token flow being triggered during fuzzing.
 	tokenflowTracer *tokenflow.TokenflowTracer
+
+	// bugDetectorTracer is used to detect the bugs during fuzzing.
+	bugDetectorTracer *bugdetector.BugDetectorTracer
 }
 
 // newFuzzerWorker creates a new FuzzerWorker, assigning it the provided worker index/id and associating it to the

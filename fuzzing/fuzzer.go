@@ -1244,6 +1244,17 @@ func (f *Fuzzer) printMetricsLoop() {
 				}
 			}
 		}
+
+		// log bug detection results
+		if f.config.Fuzzing.UseBugDetector() {
+			bugs := f.corpus.BugMap().BugDetectionResult()
+			logBuffer.Append(fmt.Sprintf(", bugs (%d): [", len(bugs)), colors.Bold, colors.Reset)
+			for _, bug := range bugs {
+				logBuffer.Append(bug, ",", colors.Reset)
+			}
+			logBuffer.Append("]", colors.Bold, colors.Reset)
+		}
+
 		f.logger.Info(logBuffer.Elements()...)
 
 		// Update our delta tracking metrics

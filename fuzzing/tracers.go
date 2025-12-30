@@ -1,8 +1,12 @@
 package fuzzing
 
 import (
+	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa/chain"
+	"github.com/crytic/medusa/fuzzing/bugdetector"
+	"github.com/crytic/medusa/fuzzing/config"
 	bracnhcoverage "github.com/crytic/medusa/fuzzing/coverage"
+	"github.com/crytic/medusa/fuzzing/executiontracer"
 	"github.com/crytic/medusa/fuzzing/fitnessmetrics/branchdistance"
 	cmpdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/cmpdistance"
 	codecoverage "github.com/crytic/medusa/fuzzing/fitnessmetrics/codecoverage"
@@ -48,7 +52,30 @@ func (fw *FuzzerWorker) attachTracersToChain(initializedChain *chain.TestChain) 
 		initializedChain.AddTracer(fw.tokenflowTracer.NativeTracer(), true, false)
 	}
 
+	// attach bug detector
+	if fw.fuzzer.config.Fuzzing.UseBugDetector() {
+		fw.bugDetectorTracer = bugdetector.NewBugDetectorTracer(FuzzHelperContractAddress, &fw.fuzzer.config.Fuzzing.BugDetectionConfig)
+		initializedChain.AddTracer(fw.bugDetectorTracer.NativeTracer(), true, false)
+
+		// set original ether for ether leaking
+		if fw.fuzzer.config.Fuzzing.BugDetectionConfig.EtherLeaking {
+			fw.bugDetectorTracer.SetOriginalEther(fw.fuzzer.config.Fuzzing.SenderAddressBalances)
+		}
+
+		if fw.fuzzer.config.Fuzzing.BugDetectionConfig.EtherLeaking || fw.fuzzer.config.Fuzzing.BugDetectionConfig.UnsafeDelegateCall {
+			var ads []common.Address
+			for _, addr := range fw.fuzzer.config.Fuzzing.SenderAddresses {
+				ads = append(ads, common.HexToAddress(addr))
+			}
+			if FuzzHelperContractAddress != common.HexToAddress("0x") {
+				ads = append(ads, FuzzHelperContractAddress)
+			}
+
+			fw.bugDetectorTracer.SetAdversarialAddresses(ads)
+		}
+	}
+
 	// debug: tracing execution trace
-	// fw.executionTracer = executiontracer.NewExecutionTracer(fw.fuzzer.contractDefinitions, initializedChain, config.VeryVeryVerbose)
-	// initializedChain.AddTracer(fw.executionTracer.NativeTracer(), true, false)
+	fw.executionTracer = executiontracer.NewExecutionTracer(fw.fuzzer.contractDefinitions, initializedChain, config.VeryVeryVerbose)
+	initializedChain.AddTracer(fw.executionTracer.NativeTracer(), true, false)
 }

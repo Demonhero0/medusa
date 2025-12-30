@@ -15,6 +15,7 @@ import (
 
 	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa/chain"
+	"github.com/crytic/medusa/fuzzing/bugdetector"
 	"github.com/crytic/medusa/fuzzing/calls"
 	"github.com/crytic/medusa/fuzzing/config"
 	"github.com/crytic/medusa/fuzzing/contracts"
@@ -90,6 +91,9 @@ type Corpus struct {
 
 	// tokenflowMaps describes the token flow being triggered
 	tokenflowMaps *tokenflow.TokenflowSet
+
+	// for risk bug detector
+	bugMap *bugdetector.BugMap
 }
 
 // NewCorpus initializes a new Corpus object, reading artifacts from the provided directory and preparing in-memory
@@ -113,6 +117,9 @@ func NewCorpus(corpusDirectory string, fuzzingConfig *config.FuzzingConfig) (*Co
 		dataflowMaps:       dataflow.NewDataflowSet(),
 		storageWriteMaps:   storagewrite.NewStorageWriteSet(),
 		tokenflowMaps:      tokenflow.NewTokenflowSet(),
+
+		// for bug detector
+		bugMap: bugdetector.NewBugMap(),
 	}
 
 	// If we have a corpus directory set, parse our call sequences.
@@ -735,6 +742,14 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 		tokenflow.RemoveTokenflowTracerResults(lastMessageResult)
 	}
 
+	if c.fuzzingConfig.UseBugDetector() {
+		bugMap := bugdetector.GetBugDetectorTracerResults(lastMessageResult)
+		_, err := c.bugMap.Update(bugMap)
+		if err != nil {
+			return err
+		}
+	}
+
 	// If we had an increase in non-reverted or reverted coverage, we save the sequence.
 	// Note: We only want to save the sequence once. We're most interested if it can be used for mutations first.
 	if updated {
@@ -771,4 +786,8 @@ func (c *Corpus) BranchDistanceMaps() *branchdistance.BranchDistanceMaps {
 
 func (c *Corpus) CmpDistanceMaps() *cmpdistance.CmpDistanceMaps {
 	return c.cmpDistanceMaps
+}
+
+func (c *Corpus) BugMap() *bugdetector.BugMap {
+	return c.bugMap
 }

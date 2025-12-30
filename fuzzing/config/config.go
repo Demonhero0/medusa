@@ -124,6 +124,9 @@ type FuzzingConfig struct {
 
 	// For fitness metrics recording
 	MetricRecordConfig MetricRecordConfig `json:"metricRecordConfig"`
+
+	// BugDetectionConfig describes the configuration used for bug detection
+	BugDetectionConfig BugDetectionConfig `json:"bugDetectionConfig"`
 }
 
 // ContractBalance wraps big.Int to provide custom JSON marshaling/unmarshaling
@@ -559,4 +562,18 @@ func (f *FuzzingConfig) UseBranchDistanceTracing() bool {
 
 func (f *FuzzingConfig) UseCmpDistanceTracing() bool {
 	return f.FitnessMetricConfig.CmpDistanceEnabled || f.MetricRecordConfig.CmpDistanceEnabled
+}
+
+type BugDetectionConfig struct {
+	Enabled            bool `json:"enabled"`
+	IntegerOverflow    bool `json:"integerOverflow"`
+	Reentrancy         bool `json:"reentrancy"`
+	EtherLeaking       bool `json:"etherLeaking"`
+	Suicidal           bool `json:"suicidal"`
+	BlockDependency    bool `json:"blockDependency"`
+	UnsafeDelegateCall bool `json:"unsafeDelegateCall"`
+}
+
+func (f *FuzzingConfig) UseBugDetector() bool {
+	return f.BugDetectionConfig.Enabled
 }
