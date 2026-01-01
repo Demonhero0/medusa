@@ -1,7 +1,9 @@
 package bugdetector
 
 import (
+	"fmt"
 	"sync"
+	"time"
 )
 
 var _bugTypes = []string{
@@ -9,7 +11,7 @@ var _bugTypes = []string{
 }
 
 type BugMap struct {
-	bugMap map[string]bool
+	bugMap map[string]string
 	lock   sync.RWMutex
 }
 
@@ -19,7 +21,8 @@ func (ds *BugMap) BugDetectionResult() []string {
 
 	var bugs []string
 	for bug := range ds.bugMap {
-		bugs = append(bugs, bug)
+		bugString := fmt.Sprintf("%s-%s", bug, ds.bugMap[bug])
+		bugs = append(bugs, bugString)
 	}
 
 	return bugs
@@ -34,14 +37,14 @@ func NewBugMap() *BugMap {
 
 // Reset clears the storage-write state for the BugMap.
 func (ds *BugMap) Reset() {
-	ds.bugMap = make(map[string]bool)
+	ds.bugMap = make(map[string]string)
 }
 
 // Update updates the current storage-write set with the provided ones.
 // Returns two booleans indicating whether successful or reverted storage-write increased, or an error if one occurred.
-func (ds *BugMap) Update(bugMMap *BugMap) (bool, error) {
+func (ds *BugMap) Update(bugMap *BugMap) (bool, error) {
 	// If our maps provided are nil, do nothing
-	if bugMMap == nil {
+	if bugMap == nil {
 		return false, nil
 	}
 
@@ -50,9 +53,11 @@ func (ds *BugMap) Update(bugMMap *BugMap) (bool, error) {
 	defer ds.lock.Unlock()
 
 	successUpdated := false
-	for bug := range bugMMap.bugMap {
-		ds.bugMap[bug] = true
-		successUpdated = true
+	for bug := range bugMap.bugMap {
+		if _, exists := ds.bugMap[bug]; !exists {
+			ds.bugMap[bug] = bugMap.bugMap[bug]
+			successUpdated = true
+		}
 	}
 
 	return successUpdated, nil
@@ -65,8 +70,10 @@ func (ds *BugMap) CoverBug(bugId string) (bool, error) {
 	_, exists := ds.bugMap[bugId]
 	if exists {
 		return false, nil
+	} else {
+		covered_time := time.Since(StartTimeForBugDetector).Round(time.Microsecond).String()
+		ds.bugMap[bugId] = covered_time
 	}
-	ds.bugMap[bugId] = true
 
 	return true, nil
 }

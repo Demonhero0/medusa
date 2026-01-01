@@ -17,6 +17,7 @@ import (
 
 	"github.com/crytic/medusa-geth/crypto"
 
+	"github.com/crytic/medusa/fuzzing/bugdetector"
 	"github.com/crytic/medusa/fuzzing/executiontracer"
 	"github.com/crytic/medusa/fuzzing/reverts"
 
@@ -1146,6 +1147,7 @@ func (f *Fuzzer) monitorCorpusInitialization() {
 
 	// Capture an approximate start time
 	startTime := time.Now()
+
 	for !utils.CheckContextDone(f.ctx) && !utils.CheckContextDone(f.emergencyCtx) {
 		// Go to sleep if corpus is still initializing
 		if f.corpus.InitializingCorpus() {
@@ -1178,6 +1180,9 @@ func (f *Fuzzer) monitorCorpusInitialization() {
 func (f *Fuzzer) printMetricsLoop() {
 	// Define our start time
 	startTime := time.Now()
+
+	// record the start time for bug detector
+	bugdetector.StartTimeForBugDetector = time.Now()
 
 	// Define cached variables for our metrics to calculate deltas.
 	lastCallsTested := big.NewInt(0)
@@ -1284,7 +1289,7 @@ func (f *Fuzzer) printMetricsLoop() {
 		}
 
 		// Sleep some time between print iterations
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Second * 1)
 	}
 }
 

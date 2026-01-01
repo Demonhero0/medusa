@@ -2,6 +2,7 @@ package bugdetector
 
 import (
 	"math/big"
+	"time"
 
 	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa-geth/core/tracing"
@@ -12,6 +13,8 @@ import (
 	"github.com/crytic/medusa/chain/types"
 	"github.com/crytic/medusa/fuzzing/config"
 )
+
+var StartTimeForBugDetector time.Time
 
 // bugDetectorTracerResultsKey describes the key to use when storing tracer results in call message results,
 // or when querying them.
