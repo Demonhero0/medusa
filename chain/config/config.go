@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/crytic/medusa-geth/common"
+	"github.com/crytic/medusa-geth/core/types"
 	"github.com/crytic/medusa-geth/core/vm"
 )
 
@@ -22,6 +23,9 @@ type TestChainConfig struct {
 
 	// ForkConfig indicates the RPC configuration if fuzzing using a network fork.
 	ForkConfig ForkConfig `json:"forkConfig,omitempty"`
+
+	// StateOverrides make override to the state
+	StateOverrides map[common.Address]types.Account `json:"stateOverrides,omitempty"`
 }
 
 // ForkConfig describes configuration for fuzzing using a network fork

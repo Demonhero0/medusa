@@ -504,6 +504,11 @@ func (f *Fuzzer) createTestChain() (*chain.TestChain, error) {
 		Balance: new(big.Int).Set(initBalance),
 	}
 
+	// State override
+	for addr, account := range f.config.Fuzzing.TestChainConfig.StateOverrides {
+		genesisAlloc[addr] = account
+	}
+
 	// Identify which contracts need to be predeployed to a deterministic address by iterating across the mapping
 	contractAddressOverrides := make(map[common.Hash]common.Address, len(f.config.Fuzzing.PredeployedContracts))
 	for contractName, addrStr := range f.config.Fuzzing.PredeployedContracts {
