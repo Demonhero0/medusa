@@ -99,7 +99,10 @@ func (ta *TaintAnalyzer) AddTaintSourceByString(id string) {
 	if _, exists := ta.taintStacks[0]; !exists {
 		ta.taintStacks[0] = make(TaintOpcodes)
 	}
-	ta.taintStacks[0][id] = nil
+	ta.taintStacks[0][id] = &TaintOpcode{
+		opcode: 0x0,
+		pc:     0,
+	}
 }
 
 // add taint memory region with pc-opcode identifier
