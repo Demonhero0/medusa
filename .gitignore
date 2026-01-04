@@ -33,3 +33,6 @@ result
 # tmp files
 tmp_*
 
+# python
+.venv
+

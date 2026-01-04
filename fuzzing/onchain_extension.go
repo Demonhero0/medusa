@@ -14,17 +14,6 @@ import (
 	"github.com/crytic/medusa-geth/common"
 )
 
-type ContractInfo struct {
-	Address          string `json:"address"`
-	CompilerVersion  string `json:"compilerVersion"`
-	ContractName     string `json:"contractName"`
-	ContractPath     string `json:"contractPath"`
-	MainContractPath string `json:"mainContractPath"`
-	Abi              string `json:"abi"`
-	Proxy            bool   `json:"Proxy"`
-	Implementation   string `json:"Implementation"`
-}
-
 func (f *Fuzzer) loadOnChainContract(targetAddress string) (*compilationTypes.CompiledContract, error) {
 	targetAddress = strings.ToLower(targetAddress)
 	contractAbiStr, err := getAbiStr(targetAddress)
@@ -43,7 +32,7 @@ func (f *Fuzzer) loadOnChainContract(targetAddress string) (*compilationTypes.Co
 	return &contract, nil
 }
 
-func getAbiStr(address string) (string, error) {
+func getAbiStrFromJson(address string) (string, error) {
 	abiFilePath := "abi.json"
 	content, err := os.ReadFile(abiFilePath)
 	if err != nil {
@@ -90,6 +79,31 @@ func getAbiStr(address string) (string, error) {
 	}
 
 	return "[" + strings.Join(methodAbis, ",") + "]", nil
+}
+
+const ABIPath string = "abis"
+
+func getAbiStr(address string) (string, error) {
+	address = strings.ToLower(address)
+	abiPath := fmt.Sprintf("%s/%s.json", ABIPath, address)
+	isExistFile := true
+	if _, err := os.Stat(abiPath); os.IsNotExist(err) {
+		isExistFile = false
+	} else if err != nil {
+		isExistFile = false
+	}
+
+	// existing file
+	if isExistFile {
+		content, err := os.ReadFile(abiPath)
+		if err != nil {
+			return "", err
+		}
+		jsonString := string(content)
+		return jsonString, nil
+	} else {
+		return getAbiStrFromJson(address)
+	}
 }
 
 func chainSetupOnChain(fuzzer *Fuzzer, testChain *chain.TestChain) (*executiontracer.ExecutionTrace, error) {
