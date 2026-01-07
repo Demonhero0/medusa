@@ -20,6 +20,7 @@ import (
 	"github.com/crytic/medusa/fuzzing/config"
 	"github.com/crytic/medusa/fuzzing/contracts"
 	"github.com/crytic/medusa/fuzzing/coverage"
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/branchcoverage"
 	branchdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/branchdistance"
 	cmpdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/cmpdistance"
 	codecoverage "github.com/crytic/medusa/fuzzing/fitnessmetrics/codecoverage"
@@ -75,7 +76,7 @@ type Corpus struct {
 	codeCoverageMaps *codecoverage.CoverageMaps
 
 	// branchCoverageMaps describes the total branches known to be achieved across all corpus call sequences
-	branchCoverageMaps *coverage.CoverageMaps
+	branchCoverageMaps *branchcoverage.CoverageMaps
 
 	// cmpDistanceMaps describes the closest distance to trigger unseen condidions in comparison opeartions
 	cmpDistanceMaps *cmpdistance.CmpDistanceMaps
@@ -111,7 +112,7 @@ func NewCorpus(corpusDirectory string, fuzzingConfig *config.FuzzingConfig) (*Co
 		// for fitness metrics
 		fuzzingConfig:      fuzzingConfig,
 		codeCoverageMaps:   codecoverage.NewCoverageMaps(),
-		branchCoverageMaps: coverage.NewCoverageMaps(),
+		branchCoverageMaps: branchcoverage.NewCoverageMaps(),
 		cmpDistanceMaps:    cmpdistance.NewCmpDistanceMaps(),
 		branchDistanceMaps: branchdistance.NewBranchDistanceMaps(),
 		dataflowMaps:       dataflow.NewDataflowSet(),
@@ -665,7 +666,7 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 
 	// Merge the coverage maps into our total coverage maps and check if we had an update.
 	if c.fuzzingConfig.UseBranchCoverageTracing() {
-		coverageMaps := coverage.GetCoverageTracerResults(lastMessageResult)
+		coverageMaps := branchcoverage.GetCoverageTracerResults(lastMessageResult)
 		coverageUpdated, err := c.branchCoverageMaps.Update(coverageMaps)
 		if err != nil {
 			return err
@@ -766,6 +767,10 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 // CoverageMaps exposes coverage details for all call sequences known to the corpus.
 func (c *Corpus) CodeCoverageMaps() *codecoverage.CoverageMaps {
 	return c.codeCoverageMaps
+}
+
+func (c *Corpus) BranchCoverageMaps() *branchcoverage.CoverageMaps {
+	return c.branchCoverageMaps
 }
 
 func (c *Corpus) DataflowSet() *dataflow.DataflowSet {

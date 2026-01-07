@@ -36,3 +36,5 @@ tmp_*
 # python
 .venv
 
+.medusacache
+

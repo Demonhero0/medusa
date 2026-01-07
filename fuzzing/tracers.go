@@ -5,8 +5,8 @@ import (
 	"github.com/crytic/medusa/chain"
 	"github.com/crytic/medusa/fuzzing/bugdetector"
 	"github.com/crytic/medusa/fuzzing/config"
-	bracnhcoverage "github.com/crytic/medusa/fuzzing/coverage"
 	"github.com/crytic/medusa/fuzzing/executiontracer"
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/branchcoverage"
 	"github.com/crytic/medusa/fuzzing/fitnessmetrics/branchdistance"
 	cmpdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/cmpdistance"
 	codecoverage "github.com/crytic/medusa/fuzzing/fitnessmetrics/codecoverage"
@@ -23,8 +23,11 @@ func (fw *FuzzerWorker) attachTracersToChain(initializedChain *chain.TestChain) 
 	}
 
 	if fw.fuzzer.config.Fuzzing.UseBranchCoverageTracing() {
-		fw.coverageTracer = bracnhcoverage.NewCoverageTracer()
-		initializedChain.AddTracer(fw.coverageTracer.NativeTracer(), true, false)
+		// fw.coverageTracer = bracnhcoverage.NewCoverageTracer()
+		// initializedChain.AddTracer(fw.coverageTracer.NativeTracer(), true, false)
+
+		fw.branchCoverageTracer = branchcoverage.NewCoverageTracer(fw.fuzzer.contractDefinitions)
+		initializedChain.AddTracer(fw.branchCoverageTracer.NativeTracer(), true, false)
 	}
 
 	if fw.fuzzer.config.Fuzzing.UseCmpDistanceTracing() {

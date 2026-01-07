@@ -20,6 +20,7 @@ import (
 	"github.com/crytic/medusa/utils"
 	"golang.org/x/exp/maps"
 
+	"github.com/crytic/medusa/fuzzing/fitnessmetrics/branchcoverage"
 	branchdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/branchdistance"
 	cmpdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/cmpdistance"
 	codecoverage "github.com/crytic/medusa/fuzzing/fitnessmetrics/codecoverage"
@@ -83,6 +84,8 @@ type FuzzerWorker struct {
 
 	// codeCoverageTracer describes the tracer used to collect code coverage maps during fuzzing campaigns.
 	codeCoverageTracer *codecoverage.CoverageTracer
+
+	branchCoverageTracer *branchcoverage.CoverageTracer
 
 	// cmpDistanceTracer is used to collect comparison operation data during fuzzing.
 	cmpDistanceTracer *cmpdistance.CmpDistanceTracer

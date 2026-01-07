@@ -1227,6 +1227,12 @@ func (f *Fuzzer) printMetricsLoop() {
 			logBuffer.Append(", code coverage: ", colors.Bold, fmt.Sprintf("%v (%.2f)", c, rate), colors.Reset)
 		}
 
+		if f.config.Fuzzing.UseBranchCoverageTracing() {
+			c, t := f.corpus.BranchCoverageMaps().TotalBranchCoverage([]common.Address{})
+			rate := float64(c) / float64(t)
+			logBuffer.Append(", branch coverage: ", colors.Bold, fmt.Sprintf("%v (%.2f)", c, rate), colors.Reset)
+		}
+
 		if f.config.Fuzzing.UseDataflowTracing() {
 			c := f.corpus.DataflowSet().TotalDataflowCount()
 			logBuffer.Append(", dataflow: ", colors.Bold, fmt.Sprintf("%d", c), colors.Reset)

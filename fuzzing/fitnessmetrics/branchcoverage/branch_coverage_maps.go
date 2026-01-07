@@ -1,16 +1,14 @@
-package codecoverage
+package branchcoverage
 
 import (
-	"bytes"
 	"sync"
 
 	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa-geth/crypto"
 	compilationTypes "github.com/crytic/medusa/compilation/types"
-	"github.com/crytic/medusa/utils"
 )
 
-// CoverageMaps represents a data structure used to identify instruction execution coverage of various smart contracts
+// CoverageMaps represents a data structure used to identify branch coverage of various smart contracts
 // across a transaction or multiple transactions.
 type CoverageMaps struct {
 	// maps represents a structure used to track every ContractCoverageMap by a given deployed address/lookup hash.
@@ -34,12 +32,12 @@ type CoverageMaps struct {
 	lock sync.RWMutex
 }
 
-func (cm *CoverageMaps) TotalCodeCoverage(targetAddresses []common.Address) (int, int) {
+func (cm *CoverageMaps) TotalBranchCoverage(targetAddresses []common.Address) (int, int) {
 	cm.lock.RLock()
 	defer cm.lock.RUnlock()
 
-	coveredCodeSize := 0
-	totalCodeSize := 0
+	coveredBranchSize := 0
+	totalBranchSize := 0
 	for i := range cm.maps {
 		if len(targetAddresses) > 0 {
 			for _, j := range targetAddresses {
@@ -48,18 +46,18 @@ func (cm *CoverageMaps) TotalCodeCoverage(targetAddresses []common.Address) (int
 					continue
 				}
 				c, t := ccm.getCoverageRate()
-				coveredCodeSize += c
-				totalCodeSize += t
+				coveredBranchSize += c
+				totalBranchSize += t
 			}
 		} else {
-			for j := range cm.maps[i] {
-				c, t := cm.maps[i][j].getCoverageRate()
-				coveredCodeSize += c
-				totalCodeSize += t
+			for _, j := range cm.maps[i] {
+				c, t := j.getCoverageRate()
+				coveredBranchSize += c
+				totalBranchSize += t
 			}
 		}
 	}
-	return coveredCodeSize, totalCodeSize
+	return coveredBranchSize, totalBranchSize
 }
 
 // NewCoverageMaps initializes a new CoverageMaps object.
@@ -78,36 +76,6 @@ func (cm *CoverageMaps) Reset() {
 	cm.cachedCodeAddress = common.Address{}
 	cm.cachedCodeHash = common.Hash{}
 	cm.cachedMap = nil
-}
-
-// Equal checks whether two coverage maps are the same. Equality is determined if the keys and values are all the same.
-func (cm *CoverageMaps) Equal(b *CoverageMaps) bool {
-	cm.lock.RLock()
-	defer cm.lock.RUnlock()
-	b.lock.RLock()
-	defer b.lock.RUnlock()
-
-	// Iterate through all maps
-	for codeHash, mapsByAddressA := range cm.maps {
-		mapsByAddressB, ok := b.maps[codeHash]
-		// Hash is not in b - we're done
-		if !ok {
-			return false
-		}
-		for codeAddress, coverageMapA := range mapsByAddressA {
-			coverageMapB, ok := mapsByAddressB[codeAddress]
-			// Address is not in b - we're done
-			if !ok {
-				return false
-			}
-
-			// Verify the equality of the map data.
-			if !coverageMapA.Equal(coverageMapB) {
-				return false
-			}
-		}
-	}
-	return true
 }
 
 // getContractCoverageMapHash obtain the hash used to look up a given contract's ContractCoverageMap.
@@ -159,7 +127,7 @@ func (cm *CoverageMaps) GetContractCoverageMap(bytecode []byte, init bool) (*Con
 }
 
 // Update updates the current coverage maps with the provided ones.
-// Returns a boolean indicating whether successful coverage changed, or an error if one occurred.
+// Returns two booleans indicating whether successful or reverted coverage changed, or an error if one occurred.
 func (cm *CoverageMaps) Update(coverageMaps *CoverageMaps) (bool, error) {
 	// If our maps provided are nil, do nothing
 	if coverageMaps == nil {
@@ -202,10 +170,10 @@ func (cm *CoverageMaps) Update(coverageMaps *CoverageMaps) (bool, error) {
 	return successCoverageChanged, nil
 }
 
-// SetAt sets the coverage state of a given program counter location within code coverage data.
-func (cm *CoverageMaps) SetAt(codeAddress common.Address, codeLookupHash common.Hash, codeSize int, instrLen int, pc uint64) (bool, error) {
-	// If the code size is zero, do nothing
-	if codeSize == 0 {
+// SetAt sets the coverage state of a given path of a branch instruction within code coverage data.
+func (cm *CoverageMaps) SetAt(codeAddress common.Address, codeLookupHash common.Hash, branchSize, id int) (bool, error) {
+	// If the branch size is zero, do nothing
+	if branchSize == 0 {
 		return false, nil
 	}
 
@@ -247,59 +215,63 @@ func (cm *CoverageMaps) SetAt(codeAddress common.Address, codeLookupHash common.
 	}
 
 	// Set our coverage in the map and return our change state
-	changedInMap, err = coverageMap.setCoveredAt(codeSize, instrLen, pc)
+	changedInMap, err = coverageMap.setCoveredAt(branchSize, id)
 	return addedNewMap || changedInMap, err
 }
 
+// RevertAll sets all coverage in the coverage map as reverted coverage. Reverted coverage is updated with successful
+// coverage, the successful coverage is cleared.
+// Returns a boolean indicating whether reverted coverage increased, and an error if one occurred.
 func (cm *CoverageMaps) RevertAll() {
+	// Acquire our thread lock and defer our unlocking for when we exit this method
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
 
 	// Loop for each coverage map provided
 	for _, mapsByAddressToMerge := range cm.maps {
 		for _, contractCoverageMap := range mapsByAddressToMerge {
+
+			// Clear our successful coverage, as these maps were marked as reverted.
 			contractCoverageMap.successfulCoverage.Reset()
 		}
 	}
 }
 
-// ContractCoverageMap represents a data structure used to identify instruction execution coverage of a contract.
+// ContractCoverageMap represents a data structure used to identify branch coverage of a contract.
 type ContractCoverageMap struct {
 	// successfulCoverage represents coverage for the contract bytecode, which did not encounter a revert and was
 	// deemed successful.
-	successfulCoverage *CoverageMapBytecodeData
+	successfulCoverage *CoverageMapBranchData
 }
 
 // newContractCoverageMap creates and returns a new ContractCoverageMap.
 func newContractCoverageMap() *ContractCoverageMap {
 	return &ContractCoverageMap{
-		successfulCoverage: &CoverageMapBytecodeData{},
+		successfulCoverage: &CoverageMapBranchData{},
 	}
 }
 
-// Equal checks whether the provided ContractCoverageMap contains the same data as the current one.
-// Returns a boolean indicating whether the two maps match.
-func (cm *ContractCoverageMap) Equal(b *ContractCoverageMap) bool {
-	// Compare both our underlying bytecode coverage maps.
-	return cm.successfulCoverage.Equal(b.successfulCoverage)
-}
-
 // update creates updates the current ContractCoverageMap with the provided one.
-// Returns a boolean indicating whether successful coverage changed, or an error if one was encountered.
+// Returns two booleans indicating whether successful or reverted coverage changed, or an error if one was encountered.
 func (cm *ContractCoverageMap) update(coverageMap *ContractCoverageMap) (bool, error) {
 	// Update our success coverage data
-	return cm.successfulCoverage.update(coverageMap.successfulCoverage)
+	successfulCoverageChanged, err := cm.successfulCoverage.update(coverageMap.successfulCoverage)
+	if err != nil {
+		return false, err
+	}
+
+	return successfulCoverageChanged, nil
 }
 
-// setCoveredAt sets the coverage state at a given program counter location within a ContractCoverageMap used for
+// setCoveredAt sets the coverage state at a given branch within a ContractCoverageMap used for
 // "successful" coverage (non-reverted).
 // Returns a boolean indicating whether new coverage was achieved, or an error if one occurred.
-func (cm *ContractCoverageMap) setCoveredAt(codeSize int, instrLen int, pc uint64) (bool, error) {
-	// Set our coverage data for the successful path.
-	return cm.successfulCoverage.setCoveredAt(codeSize, instrLen, pc)
+func (cm *ContractCoverageMap) setCoveredAt(branchSize, id int) (bool, error) {
+	// Set our coverage data for the successful branch.
+	return cm.successfulCoverage.setCoveredAt(branchSize, id)
 }
 
-// getCoverageRate returns the covered code size and the total code size of the contract.
+// getCoverageRate returns the covered branch size and the total branch size of the contract.
 func (cm *ContractCoverageMap) getCoverageRate() (int, int) {
 	return cm.successfulCoverage.getCoverageRate()
 }
@@ -308,47 +280,20 @@ func (cm *ContractCoverageMap) getCoverageByteMap() []byte {
 	return cm.successfulCoverage.executedFlags
 }
 
-// CoverageMapBytecodeData represents a data structure used to identify instruction execution coverage of some init
+// CoverageMapBranchData represents a data structure used to identify branch coverage of some init
 // or runtime bytecode.
-type CoverageMapBytecodeData struct {
+type CoverageMapBranchData struct {
 	executedFlags []byte
-	instrLen      int
 }
 
-// Reset resets the bytecode coverage map data to be empty.
-func (cm *CoverageMapBytecodeData) Reset() {
+// Reset resets the branch coverage map data to be empty.
+func (cm *CoverageMapBranchData) Reset() {
 	cm.executedFlags = nil
 }
 
-// Equal checks whether the provided CoverageMapBytecodeData contains the same data as the current one.
-// Returns a boolean indicating whether the two maps match.
-func (cm *CoverageMapBytecodeData) Equal(b *CoverageMapBytecodeData) bool {
-	// Return an equality comparison on the data, ignoring size checks by stopping at the end of the shortest slice.
-	// We do this to avoid comparing arbitrary length constructor arguments appended to init bytecode.
-	smallestSize := utils.Min(len(cm.executedFlags), len(b.executedFlags))
-	return bytes.Equal(cm.executedFlags[:smallestSize], b.executedFlags[:smallestSize])
-}
-
-// IsCovered checks if a given program counter location is covered by the map.
-// Returns a boolean indicating if the program counter was executed on this map.
-func (cm *CoverageMapBytecodeData) IsCovered(pc int) bool {
-	// If the coverage map bytecode data is nil, this is not covered.
-	if cm == nil {
-		return false
-	}
-
-	// If this map has no execution data or is out of bounds, it is not covered.
-	if cm.executedFlags == nil || len(cm.executedFlags) <= pc {
-		return false
-	}
-
-	// Otherwise, return the execution flag
-	return cm.executedFlags[pc] != 0
-}
-
-// update creates updates the current CoverageMapBytecodeData with the provided one.
+// update creates updates the current CoverageMapBranchData with the provided one.
 // Returns a boolean indicating whether new coverage was achieved, or an error if one was encountered.
-func (cm *CoverageMapBytecodeData) update(coverageMap *CoverageMapBytecodeData) (bool, error) {
+func (cm *CoverageMapBranchData) update(coverageMap *CoverageMapBranchData) (bool, error) {
 	// If the coverage map execution data provided is nil, exit early
 	if coverageMap.executedFlags == nil {
 		return false, nil
@@ -357,11 +302,10 @@ func (cm *CoverageMapBytecodeData) update(coverageMap *CoverageMapBytecodeData) 
 	// If the current map has no execution data, simply set it to the provided one.
 	if cm.executedFlags == nil {
 		cm.executedFlags = coverageMap.executedFlags
-		cm.instrLen = coverageMap.instrLen
 		return true, nil
 	}
 
-	// Update each byte which represents a position in the bytecode which was covered.
+	// Update each byte which represents a branch which was covered.
 	changed := false
 	for i := 0; i < len(cm.executedFlags) && i < len(coverageMap.executedFlags); i++ {
 		if cm.executedFlags[i] == 0 && coverageMap.executedFlags[i] != 0 {
@@ -372,19 +316,18 @@ func (cm *CoverageMapBytecodeData) update(coverageMap *CoverageMapBytecodeData) 
 	return changed, nil
 }
 
-// setCoveredAt sets the coverage state at a given program counter location within a CoverageMapBytecodeData.
+// setCoveredAt sets the coverage state at a given branch id within a CoverageMapBlockData.
 // Returns a boolean indicating whether new coverage was achieved, or an error if one occurred.
-func (cm *CoverageMapBytecodeData) setCoveredAt(codeSize int, instrLen int, pc uint64) (bool, error) {
+func (cm *CoverageMapBranchData) setCoveredAt(branchSize, id int) (bool, error) {
 	// If the execution flags don't exist, create them for this code size.
 	if cm.executedFlags == nil {
-		cm.executedFlags = make([]byte, codeSize)
-		cm.instrLen = instrLen
+		cm.executedFlags = make([]byte, branchSize)
 	}
 
 	// If our program counter is in range, determine if we achieved new coverage for the first time, and update it.
-	if pc < uint64(len(cm.executedFlags)) {
-		if cm.executedFlags[pc] == 0 {
-			cm.executedFlags[pc] = 1
+	if id < len(cm.executedFlags) {
+		if cm.executedFlags[id] == 0 {
+			cm.executedFlags[id] = 1
 			return true, nil
 		}
 		return false, nil
@@ -395,13 +338,12 @@ func (cm *CoverageMapBytecodeData) setCoveredAt(codeSize int, instrLen int, pc u
 	return false, nil
 }
 
-// getCoverageRate returns the covered code size and the total code size.
-func (cm *CoverageMapBytecodeData) getCoverageRate() (int, int) {
-	coveredCodeSize := 0
-	for _, flag := range cm.executedFlags {
-		if flag != 0 {
-			coveredCodeSize++
+func (cm *CoverageMapBranchData) getCoverageRate() (int, int) {
+	coveredBranchSize := 0
+	for _, v := range cm.executedFlags {
+		if v != 0 {
+			coveredBranchSize++
 		}
 	}
-	return coveredCodeSize, cm.instrLen
+	return coveredBranchSize, len(cm.executedFlags)
 }
