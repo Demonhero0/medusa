@@ -474,10 +474,6 @@ func (fw *FuzzerWorker) testNextCallSequence() ([]ShrinkCallSequenceRequest, err
 			return true, nil
 		}
 
-		// debug: print execution trace
-		// hash := utils.MessageToTransaction(latestCallSequenceElement.Call.ToCoreMessage()).Hash()
-		// fmt.Println(hash, fw.executionTracer.GetTrace(hash))
-
 		// If we have shrink requests, it means we violated a test, so we quit at this point
 		return len(shrinkCallSequenceRequests) > 0, nil
 	}

@@ -675,7 +675,7 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 			updated = coverageUpdated || updated
 		}
 		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		coverage.RemoveCoverageTracerResults(lastMessageResult)
+		branchcoverage.RemoveCoverageTracerResults(lastMessageResult)
 	}
 
 	if c.fuzzingConfig.UseBranchDistanceTracing() {
@@ -760,6 +760,10 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 			return err
 		}
 	}
+
+	// debug: print execution trace
+	// hash := utils.MessageToTransaction(latestCallSequenceElement.Call.ToCoreMessage()).Hash()
+	// fmt.Println(hash, fw.executionTracer.GetTrace(hash))
 
 	return nil
 }

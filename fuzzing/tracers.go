@@ -4,8 +4,6 @@ import (
 	"github.com/crytic/medusa-geth/common"
 	"github.com/crytic/medusa/chain"
 	"github.com/crytic/medusa/fuzzing/bugdetector"
-	"github.com/crytic/medusa/fuzzing/config"
-	"github.com/crytic/medusa/fuzzing/executiontracer"
 	"github.com/crytic/medusa/fuzzing/fitnessmetrics/branchcoverage"
 	"github.com/crytic/medusa/fuzzing/fitnessmetrics/branchdistance"
 	cmpdistance "github.com/crytic/medusa/fuzzing/fitnessmetrics/cmpdistance"
@@ -16,40 +14,45 @@ import (
 )
 
 func (fw *FuzzerWorker) attachTracersToChain(initializedChain *chain.TestChain) {
+	// attach fitness metric tracers
 
+	// code coverage tracer
 	if fw.fuzzer.config.Fuzzing.UseCodeCoverageTracing() {
 		fw.codeCoverageTracer = codecoverage.NewCoverageTracer(fw.fuzzer.contractDefinitions)
 		initializedChain.AddTracer(fw.codeCoverageTracer.NativeTracer(), true, false)
 	}
 
+	// branch coverage tracer
 	if fw.fuzzer.config.Fuzzing.UseBranchCoverageTracing() {
-		// fw.coverageTracer = bracnhcoverage.NewCoverageTracer()
-		// initializedChain.AddTracer(fw.coverageTracer.NativeTracer(), true, false)
-
 		fw.branchCoverageTracer = branchcoverage.NewCoverageTracer(fw.fuzzer.contractDefinitions)
 		initializedChain.AddTracer(fw.branchCoverageTracer.NativeTracer(), true, false)
 	}
 
+	// cmp distance tracer
 	if fw.fuzzer.config.Fuzzing.UseCmpDistanceTracing() {
 		fw.cmpDistanceTracer = cmpdistance.NewCmpDistanceTracer(fw.fuzzer.contractDefinitions)
 		initializedChain.AddTracer(fw.cmpDistanceTracer.NativeTracer(), true, false)
 	}
 
+	// branch distance tracer
 	if fw.fuzzer.config.Fuzzing.UseBranchDistanceTracing() {
 		fw.branchDistanceTracer = branchdistance.NewBranchDistanceTracer(fw.fuzzer.contractDefinitions)
 		initializedChain.AddTracer(fw.branchDistanceTracer.NativeTracer(), true, false)
 	}
 
+	// data flow tracer
 	if fw.fuzzer.config.Fuzzing.UseDataflowTracing() {
 		fw.dataFlowTracer = dataflow.NewDataflowTracer()
 		initializedChain.AddTracer(fw.dataFlowTracer.NativeTracer(), true, false)
 	}
 
+	// storage write tracer
 	if fw.fuzzer.config.Fuzzing.UseStorageWriteTracing() {
 		fw.storageWriteTracer = storagewrite.NewStorageWriteTracer()
 		initializedChain.AddTracer(fw.storageWriteTracer.NativeTracer(), true, false)
 	}
 
+	// token flow tracer
 	if fw.fuzzer.config.Fuzzing.UseTokenflowTracing() {
 		fw.tokenflowTracer = tokenflow.NewTokenflowTracer()
 		initializedChain.AddTracer(fw.tokenflowTracer.NativeTracer(), true, false)
@@ -79,6 +82,6 @@ func (fw *FuzzerWorker) attachTracersToChain(initializedChain *chain.TestChain) 
 	}
 
 	// debug: tracing execution trace
-	fw.executionTracer = executiontracer.NewExecutionTracer(fw.fuzzer.contractDefinitions, initializedChain, config.VeryVeryVerbose)
-	initializedChain.AddTracer(fw.executionTracer.NativeTracer(), true, false)
+	// fw.executionTracer = executiontracer.NewExecutionTracer(fw.fuzzer.contractDefinitions, initializedChain, config.VeryVeryVerbose)
+	// initializedChain.AddTracer(fw.executionTracer.NativeTracer(), true, false)
 }
