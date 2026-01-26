@@ -1,0 +1,7 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_integer_overflows/overflow_simple_add.sol
+DA:10,1
+DA:14,0
+FN:12,add
+FNDA:0,add
+end_of_record

@@ -1,0 +1,16 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_reentrancy/etherbank.sol
+DA:8,1
+DA:10,0
+DA:11,0
+DA:15,0
+DA:19,0
+DA:21,0
+DA:22,0
+FN:10,getBalance
+FNDA:0,getBalance
+FN:14,addToBalance
+FNDA:0,addToBalance
+FN:18,withdrawBalance
+FNDA:0,withdrawBalance
+end_of_record

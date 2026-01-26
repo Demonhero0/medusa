@@ -14,7 +14,7 @@ bash build.sh
 
 ### Loacl Testing
 
-Run the cammond for execution, where `--config` is the path of config file, `--compilation-target` is the `.sol` file to compile, `--target-contracts` is the names of the contracts to test.
+Run the command for execution, where `--config` is the path of config file, `--compilation-target` is the `.sol` file to compile, `--target-contracts` is the names of the contracts to test.
 
 ```
 ./smartfitness fuzz --config example/config.json --compilation-target example.sol --target-contracts Example
@@ -33,9 +33,37 @@ If you want to test the smart contracts deployed on chain, set the on-chain mode
     }
 ```
 
-After that, run the cammond for execution.
+After that, run the command for execution.
 ```
 ./smartfitness fuzz --config example/config_onchain.json
+```
+
+## Batch run for experiments
+
+### Experiments on Curated Dataset
+
+Run the following command, the experimental results will be stored in `experiments/Curated_Dataset/results`
+```
+cd experiments/Curated_Dataset
+python3 autorun.py
+```
+
+### Experiments on DeFiHackLabs Dataset
+
+Set the on-chain mode in `experiments/DeFiHackLabs_Dataset/autorun.py`
+```
+    "forkconfig": {
+        "forkModeEnabled": true, // Turn on for on-chain testing
+        "rpcUrl": "http://localhost:18545", // Archive nodes that provide RPC services
+        ...
+    }
+```
+
+Run the following command, the experimental results will be stored in `experiments/DeFiHackLabs_Dataset/results`
+
+```
+cd experiments/DeFiHackLabs_Dataset
+python3 autorun.py
 ```
 
 ## License

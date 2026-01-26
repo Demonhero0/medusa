@@ -1,0 +1,10 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_integer_overflows/insecure_transfer.sol
+DA:9,1
+DA:10,0
+DA:15,0
+DA:16,0
+DA:18,0
+FN:13,transfer
+FNDA:0,transfer
+end_of_record

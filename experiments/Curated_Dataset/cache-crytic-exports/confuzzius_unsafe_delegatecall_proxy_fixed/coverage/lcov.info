@@ -1,0 +1,12 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_unsafe_delegatecall/proxy_fixed.sol
+DA:9,0
+DA:14,1
+DA:15,1
+DA:19,0
+DA:23,0
+FN:18,setCallee
+FNDA:0,setCallee
+FN:22,forward
+FNDA:0,forward
+end_of_record

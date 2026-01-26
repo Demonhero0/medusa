@@ -1,0 +1,7 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_leaking_ether/simple_ether_drain.sol
+DA:3,1
+DA:6,0
+FN:5,withdrawAllAnyone
+FNDA:0,withdrawAllAnyone
+end_of_record

@@ -1,0 +1,16 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_reentrancy/reentrancy_dao.sol
+DA:9,1
+DA:14,0
+DA:15,0
+DA:16,0
+DA:18,0
+DA:19,0
+DA:20,0
+DA:25,0
+DA:26,0
+FN:13,withdrawAll
+FNDA:0,withdrawAll
+FN:24,deposit
+FNDA:0,deposit
+end_of_record

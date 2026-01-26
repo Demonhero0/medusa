@@ -1,0 +1,17 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/smartbugs-curated_reentrancy/reentrance.sol
+DA:9,1
+DA:11,0
+DA:14,0
+DA:17,0
+DA:18,0
+DA:22,0
+DA:24,0
+DA:27,0
+FN:13,donate
+FNDA:0,donate
+FN:17,balanceOf
+FNDA:0,balanceOf
+FN:21,withdraw
+FNDA:0,withdraw
+end_of_record

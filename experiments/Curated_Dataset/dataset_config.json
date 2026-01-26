@@ -1,0 +1,668 @@
+{
+    "rlf_etherleaking_suicidal/0x95195adFb67f28AcFC07CE09eb496188527C0303_3": {
+        "main_name": "CNEXToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x781fb4f25d07de3f3cfe2476645e52e0c661eefc": {
+        "main_name": "CryptoCurrencyNetwork",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x9ac4883b0226fb37fa362dbd76564c539c4f0ee6_3": {
+        "main_name": "ReferStorage",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xfbfa60a21b423cb364de616a37464b61c1bc4c88_3": {
+        "main_name": "FairDice",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/incorrect_constructor_name1": {
+        "main_name": "Missing",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xd7290307c040f4089f8650b7f7aac3cfe39cd6bd": {
+        "main_name": "UEXCloudToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/parity_wallet_bug_2": {
+        "main_name": "WalletLibrary",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/wallet_02_refund_nosub": {
+        "main_name": "Wallet",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x528732d7ff76a31bd419f1d57d549d7643c02db2_3": {
+        "main_name": "GLDS",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "name": "\"GoldDigitStandart\"",
+            "symbol": "\"GLDS\"",
+            "decimals": "0x12",
+            "initSupply": "0xe4e1c0"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x5aef06ec39e98c05201ee1e54b653c372ecb9cf3": {
+        "main_name": "FALCON",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x287fda15f8f002e5df9f536f10bbfc0816960f36_3": {
+        "main_name": "EncryptedToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xd58132f2fbd65f02beee0626542e6ee059009ab4": {
+        "main_name": "XBORNID",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x5f7bb27f7a4702ebce052745cddc1f567ec89e15_2": {
+        "main_name": "EthGame",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_owner1": "0x04f87645ca7ea324800bff5996361ac9060ecde8",
+            "_owner2": "0x3362a2d61ec7a4a90d0c0af9a56def3992f295c8",
+            "_withdrawer": "0x64b3202ceb73cf195a48d7dc2567c6fe3ec1db52",
+            "_secretSigner": "0x24cf113f8a3c768085f269bb32c1cb5485a18fda",
+            "_croupier": "0xffd60def5117bc0fdf94a1da72089f8cb1e5d867",
+            "_maxProfit": "0xa"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x8e9f6181371013194d48bc031adf7fe179fb37e3": {
+        "main_name": "Cryptbond",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x5f7bb27f7a4702ebce052745cddc1f567ec89e15_1": {
+        "main_name": "EthGame",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_owner1": "0x04f87645ca7ea324800bff5996361ac9060ecde8",
+            "_owner2": "0x3362a2d61ec7a4a90d0c0af9a56def3992f295c8",
+            "_withdrawer": "0x64b3202ceb73cf195a48d7dc2567c6fe3ec1db52",
+            "_secretSigner": "0x24cf113f8a3c768085f269bb32c1cb5485a18fda",
+            "_croupier": "0xffd60def5117bc0fdf94a1da72089f8cb1e5d867",
+            "_maxProfit": "0xa"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x34BC9A332350A41374aa650f1152C8D88e35a878_1": {
+        "main_name": "GuessTheNumberGame",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_bet": "0x4"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x11eba93a0a852fd34002f5411e1663cf864edb8b_1": {
+        "main_name": "Morality",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_totalTokensToMint": "0x6ae79f5ff4c4"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x724e3a236d3e9c8ad2c3d1aff181118e6e9b3026": {
+        "main_name": "BITCOINMILLIONARE",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xfaf33ee481f6b1f878b68c06181e46a2e9226938_1": {
+        "main_name": "EtherWin",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xe30a76ec9168639f09061e602924ae601d341066": {
+        "main_name": "NewIntelTechMedia",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x860a8c64cbc7f9aac11428ef8df989f5770cda60_2": {
+        "main_name": "SEC",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xb60e133dacf00b6f560909dc0a5311ae7f9a659b": {
+        "main_name": "GymToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x42e98f6ed27fc8f76118efb7d4fe9a254bf3bcc9_3": {
+        "main_name": "GAWToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/simple_suicide": {
+        "main_name": "SimpleSuicide",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x13a517751318cce71a524006b16f7930b3515ccf": {
+        "main_name": "Sota",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x2120887e9e4889653770b228ee8d13231d0ef045_2": {
+        "main_name": "VE",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x860a8c64cbc7f9aac11428ef8df989f5770cda60_1": {
+        "main_name": "SEC",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xfc1078a7bb4521881663df4148434acd991af14c_1": {
+        "main_name": "FSK",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x0d0edbcf2c0da25ac9a79c9466989e46a8f96221_1": {
+        "main_name": "MyEthDice",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xa78a974b487357ad5c17a072dfee4d31b839b331_1": {
+        "main_name": "HOT",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_initialAmount": "0x3b9aca00",
+            "_tokenName": "\"HOTS\"",
+            "_rate": "0x22b8"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x0208a56ea43c3ff6c2611071948794c2674a16b9_3": {
+        "main_name": "ERBIUMCOIN",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x3f30a9ac5f4d9cccfe0331948f5a8f5df1ba3856_1": {
+        "main_name": "MyAdvancedToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "initialSupply": "0x2d4cae00",
+            "tokenName": "\"MSV\"",
+            "tokenSymbol": "\"MSV\""
+        }
+    },
+    "rlf_etherleaking_suicidal/0x50430b6201c9859c91a5590ac71700cc71499a0e": {
+        "main_name": "GetPaid",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xfaf33ee481f6b1f878b68c06181e46a2e9226938_2": {
+        "main_name": "EtherWin",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x0208a56ea43c3ff6c2611071948794c2674a16b9_1": {
+        "main_name": "ERBIUMCOIN",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x05f8b281410c9327a1bbf508db380fd967c31df6": {
+        "main_name": "MyAdvancedToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "initialSupply": "0xbebc200",
+            "tokenName": "\"Test\"",
+            "tokenSymbol": "\"IFIB\""
+        }
+    },
+    "rlf_etherleaking_suicidal/0x17e5f19d430788323863c6798ecd762a40de29f5": {
+        "main_name": "VIT",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xdcd03c274982b15341b570f39e0f72e730d11f32_3": {
+        "main_name": "BitherumToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x287fda15f8f002e5df9f536f10bbfc0816960f36_2": {
+        "main_name": "EncryptedToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x9db3fd94a5bb1acdaef28ae483fe6b0d49746678": {
+        "main_name": "URANUS",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xfc1078a7bb4521881663df4148434acd991af14c_2": {
+        "main_name": "FSK",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x5f7bb27f7a4702ebce052745cddc1f567ec89e15_3": {
+        "main_name": "EthGame",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_owner1": "0x04f87645ca7ea324800bff5996361ac9060ecde8",
+            "_owner2": "0x3362a2d61ec7a4a90d0c0af9a56def3992f295c8",
+            "_withdrawer": "0x64b3202ceb73cf195a48d7dc2567c6fe3ec1db52",
+            "_secretSigner": "0x24cf113f8a3c768085f269bb32c1cb5485a18fda",
+            "_croupier": "0xffd60def5117bc0fdf94a1da72089f8cb1e5d867",
+            "_maxProfit": "0xa"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x528732d7ff76a31bd419f1d57d549d7643c02db2_1": {
+        "main_name": "GLDS",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "name": "\"GoldDigitStandart\"",
+            "symbol": "\"GLDS\"",
+            "decimals": "0x12",
+            "initSupply": "0xe4e1c0"
+        }
+    },
+    "rlf_etherleaking_suicidal/0xdcd03c274982b15341b570f39e0f72e730d11f32_1": {
+        "main_name": "BitherumToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x860a8c64cbc7f9aac11428ef8df989f5770cda60_3": {
+        "main_name": "SEC",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/wallet_04_confused_sign": {
+        "main_name": "Wallet",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xb5c0e43a6330b9eb904ec57ea24d70269ae4652e": {
+        "main_name": "Zapit",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xa78a974b487357ad5c17a072dfee4d31b839b331_2": {
+        "main_name": "HOT",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_initialAmount": "0x3b9aca00",
+            "_tokenName": "\"HOTS\"",
+            "_rate": "0x22b8"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x8960eb9d4a2d153fd7b175c0f3eef8026eb95dfc": {
+        "main_name": "LGM",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x42e98f6ed27fc8f76118efb7d4fe9a254bf3bcc9_2": {
+        "main_name": "GAWToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xeefdfa0f6a921044e7901d18e6794c0a7baff4d7": {
+        "main_name": "LUVI",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x42e98f6ed27fc8f76118efb7d4fe9a254bf3bcc9_1": {
+        "main_name": "GAWToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xf7a3c5e0310ed2bafde8e782f43ab38c1cfa279d_1": {
+        "main_name": "ReynaFoundationCoin",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x612f1bdbe93523b7f5036efa87493b76341726e3": {
+        "main_name": "HOTTO",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x11eba93a0a852fd34002f5411e1663cf864edb8b_2": {
+        "main_name": "Morality",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_totalTokensToMint": "0x6ae79f5ff4c4"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x7bd9084fdd5d021c226918d86c0721cb088b9b4a": {
+        "main_name": "MultiSend",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x43efc486d1c7c5cb0193e409a73aa33786f5197c": {
+        "main_name": "Tubigo",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x9ac4883b0226fb37fa362dbd76564c539c4f0ee6_2": {
+        "main_name": "ReferStorage",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xf34839b310097fcb4cf3a302dda8cc9b57501083": {
+        "main_name": "SACO",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x11eba93a0a852fd34002f5411e1663cf864edb8b_3": {
+        "main_name": "Morality",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_totalTokensToMint": "0x6ae79f5ff4c4"
+        }
+    },
+    "rlf_etherleaking_suicidal/0x3f30a9ac5f4d9cccfe0331948f5a8f5df1ba3856_3": {
+        "main_name": "MyAdvancedToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "initialSupply": "0x2d4cae00",
+            "tokenName": "\"MSV\"",
+            "tokenSymbol": "\"MSV\""
+        }
+    },
+    "rlf_etherleaking_suicidal/0x95195adFb67f28AcFC07CE09eb496188527C0303_2": {
+        "main_name": "CNEXToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x287fda15f8f002e5df9f536f10bbfc0816960f36_1": {
+        "main_name": "EncryptedToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xdd97853ba34af302f3d6a6415a750ae38e26d1fc": {
+        "main_name": "betContractUP",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xd152f549545093347a162dce210e7293f1452150": {
+        "main_name": "Disperse",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xf55a32f0107523c14027c4a1e6177cd7291395a0": {
+        "main_name": "EUXLinkToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x2120887e9e4889653770b228ee8d13231d0ef045_1": {
+        "main_name": "VE",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x0208a56ea43c3ff6c2611071948794c2674a16b9_2": {
+        "main_name": "ERBIUMCOIN",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x3da034753b42bda1bcfa682f29685e2fd6729016": {
+        "main_name": "VoipToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xa21c9a3ae47103b1fd1dfa04766c4d00c19e1ff6": {
+        "main_name": "CryptoOscarsToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/multiowned_vulnerable": {
+        "main_name": "TestContract",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x43f208d94a82cc2749a140b5e82636f31ce0390d": {
+        "main_name": "betContractDOWN",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x34BC9A332350A41374aa650f1152C8D88e35a878_2": {
+        "main_name": "GuessTheNumberGame",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_bet": "0x4"
+        }
+    },
+    "rlf_etherleaking_suicidal/0xfbfa60a21b423cb364de616a37464b61c1bc4c88_1": {
+        "main_name": "FairDice",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x39730ebfeb4e0c9c2e2645c528c00ee7b98ecfb2": {
+        "main_name": "BLACKCOIN",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xb5630e5dfd604b3b88965f2a5103bbf5e31a7340": {
+        "main_name": "GTIX",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/wallet_03_wrong_constructor": {
+        "main_name": "Wallet",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xead71f4d060ddc7656c959b482fbdfaca95c5d9d": {
+        "main_name": "MyAdvancedToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "initialSupply": "0xbebc200",
+            "tokenName": "\"Test\"",
+            "tokenSymbol": "\"IFIB\""
+        }
+    },
+    "rlf_etherleaking_suicidal/0x0d0edbcf2c0da25ac9a79c9466989e46a8f96221_2": {
+        "main_name": "MyEthDice",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xfbfa60a21b423cb364de616a37464b61c1bc4c88_2": {
+        "main_name": "FairDice",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xf7a3c5e0310ed2bafde8e782f43ab38c1cfa279d_3": {
+        "main_name": "ReynaFoundationCoin",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x9ac4883b0226fb37fa362dbd76564c539c4f0ee6_1": {
+        "main_name": "ReferStorage",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xfc1078a7bb4521881663df4148434acd991af14c_3": {
+        "main_name": "FSK",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0x2120887e9e4889653770b228ee8d13231d0ef045_3": {
+        "main_name": "VE",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "rlf_etherleaking_suicidal/0xfc79774fb9dedeea2325d0d5570554eddc4e6747": {
+        "main_name": "VotePumpCoin0x",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/reentrancy_insecure": {
+        "main_name": "Reentrancy_insecure",
+        "solc_version": "0.5.0",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0xbe4041d55db380c5ae9d4a9b9703f1ed4e7e3888": {
+        "main_name": "MONEY_BOX",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0x4e73b32ed6c35f570686b89848e5f39f20ecc106": {
+        "main_name": "PRIVATE_ETH_CELL",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0x7541b76cb60f4c60af330c208b0623b7f54bf615": {
+        "main_name": "U_BANK",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "log":"0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0x7a8721a9d64c74da899424c1b52acbf58ddc9782": {
+        "main_name": "PrivateDeposit",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0x93c32845fae42c83a70e5f06214c8433665c2ab5": {
+        "main_name": "X_WALLET",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "log":"0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0xb93430ce38ac4a6bb47fb1fc085ea669353fd89e": {
+        "main_name": "PrivateBank",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_lib":"0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0x941d225236464a25eb18076df7da6a91d0f95e9e": {
+        "main_name": "ETH_FUND",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_log":"0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0xaae1f51cf3339f18b6d3f3bdc75a5facd744b0b8": {
+        "main_name": "DEP_BANK",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0x627fa62ccbb1c1b04ffaecd72a53e37fc0e17839": {
+        "main_name": "TokenBank",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0xbaf51e761510c1a11bf48dd87c0307ac8a8c8a4f": {
+        "main_name": "ETH_VAULT",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_log": "0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0xf015c35649c82f5467c9c74b7f28ee67665aad68": {
+        "main_name": "MY_BANK",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "log":"0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0x96edbe868531bd23a6c05e9d0c424ea64fb1b78b": {
+        "main_name": "PENNY_BY_PENNY",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0xcead721ef5b11f1a7b530171aab69b16c5e66b6e": {
+        "main_name": "WALLET",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "log":"0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0x23a91059fdc9579a9fbd0edc5f2ea0bfdb70deb4": {
+        "main_name": "PrivateBank",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_log": "0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0x561eac93c92360949ab1f1403323e6db345cbf31": {
+        "main_name": "BANK_SAFE",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0x8c7777c45481dba411450c228cb692ac3d550344": {
+        "main_name": "ETH_VAULT",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_log":"0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0x7b368c4e805c3870b6c49a3f1f49f69af8662cf3": {
+        "main_name": "W_WALLET",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "log": "0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0xb5e1b1ee15c6fa0e48fce100125569d430f1bd12": {
+        "main_name": "Private_Bank",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_log":"0x0486cF65A2F2F3A392CBEa398AFB7F5f0B72FF46"
+        }
+    },
+    "smartbugs-curated_reentrancy/0x4320e6f8c05b27ab4707cd1f6d5ce6f3e4b3a5a1": {
+        "main_name": "ACCURAL_DEPOSIT",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "smartbugs-curated_reentrancy/0x01f8c4e3fa3edeb29e514cba738d87ce8c091d3f": {
+        "main_name": "PERSONAL_BANK",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "confuzzius_block_dependency/smart_billions": {
+        "main_name": "SmartBillions",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "confuzzius_block_dependency/blackjack": {
+        "main_name": "BlackJack",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "confuzzius_block_dependency/governmental_survey": {
+        "main_name": "Governmental",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "confuzzius_unprotected_selfdestruct/WalletLibrary": {
+        "main_name": "WalletLibrary",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "confuzzius_reentrancy/modifier_reentrancy": {
+        "main_name": "ModifierEntrancy",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "confuzzius_integer_overflows/BECToken": {
+        "main_name": "BecToken",
+        "solc_version": "0.4.25",
+        "constructor_args": {}
+    },
+    "confuzzius_integer_overflows/token": {
+        "main_name" : "Token",
+        "solc_version": "0.4.25",
+        "constructor_args": {
+            "_initialSupply": "0xbebc200"
+        }
+    },
+    "confuzzius_block_dependency/old_blockhash": {
+        "main_name": "PredictTheBlockHashChallenge",
+        "solc_version": "0.4.25",
+        "constructor_args": {},
+        "constructor_value": "0xde0b6b3a7640000"
+    },
+    "confuzzius_block_dependency/guess_the_random_number": {
+        "main_name": "GuessTheRandomNumberChallenge",
+        "solc_version": "0.4.25",
+        "constructor_args": {},
+        "constructor_value": "0xde0b6b3a7640000"
+    }
+}

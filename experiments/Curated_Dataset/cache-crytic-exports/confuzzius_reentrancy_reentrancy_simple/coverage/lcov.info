@@ -1,0 +1,16 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_reentrancy/reentrancy_simple.sol
+DA:9,1
+DA:12,0
+DA:13,0
+DA:17,0
+DA:24,0
+DA:25,0
+DA:27,0
+FN:12,getBalance
+FNDA:0,getBalance
+FN:16,addToBalance
+FNDA:0,addToBalance
+FN:20,withdrawBalance
+FNDA:0,withdrawBalance
+end_of_record

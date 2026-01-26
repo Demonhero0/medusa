@@ -1,0 +1,17 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_leaking_ether/wallet_04_confused_sign.sol
+DA:14,1
+DA:18,0
+DA:19,0
+DA:23,0
+DA:24,0
+DA:25,0
+DA:31,0
+DA:32,0
+FN:17,deposit
+FNDA:0,deposit
+FN:22,withdraw
+FNDA:0,withdraw
+FN:30,migrateTo
+FNDA:0,migrateTo
+end_of_record

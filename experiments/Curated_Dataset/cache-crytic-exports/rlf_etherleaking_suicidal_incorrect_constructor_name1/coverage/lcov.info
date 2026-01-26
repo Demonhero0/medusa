@@ -1,0 +1,11 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/rlf_etherleaking_suicidal/incorrect_constructor_name1.sol
+DA:9,1
+DA:13,0
+DA:23,0
+DA:32,0
+FN:20,IamMissing
+FNDA:0,IamMissing
+FN:28,withdraw
+FNDA:0,withdraw
+end_of_record

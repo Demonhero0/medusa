@@ -1,0 +1,17 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_block_dependency/old_blockhash.sol
+DA:21,1
+DA:25,0
+DA:26,0
+DA:28,0
+DA:29,0
+DA:33,0
+DA:35,0
+DA:37,0
+DA:38,0
+DA:39,0
+FN:24,lockInGuess
+FNDA:0,lockInGuess
+FN:32,settle
+FNDA:0,settle
+end_of_record

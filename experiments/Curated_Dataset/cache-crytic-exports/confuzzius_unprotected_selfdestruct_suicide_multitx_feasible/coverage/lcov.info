@@ -1,0 +1,13 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_unprotected_selfdestruct/suicide_multitx_feasible.sol
+DA:4,1
+DA:5,1
+DA:8,0
+DA:12,0
+DA:13,0
+DA:16,0
+FN:7,init
+FNDA:0,init
+FN:11,run
+FNDA:0,run
+end_of_record

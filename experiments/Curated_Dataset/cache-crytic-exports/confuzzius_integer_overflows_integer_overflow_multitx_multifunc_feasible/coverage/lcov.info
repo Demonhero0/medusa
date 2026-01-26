@@ -1,0 +1,13 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_integer_overflows/integer_overflow_multitx_multifunc_feasible.sol
+DA:13,1
+DA:14,1
+DA:17,0
+DA:21,0
+DA:22,0
+DA:25,0
+FN:16,init
+FNDA:0,init
+FN:20,run
+FNDA:0,run
+end_of_record

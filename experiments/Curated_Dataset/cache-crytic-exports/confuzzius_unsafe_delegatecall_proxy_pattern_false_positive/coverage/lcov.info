@@ -1,0 +1,11 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_unsafe_delegatecall/proxy_pattern_false_positive.sol
+DA:3,1
+DA:7,0
+DA:10,0
+DA:11,0
+FN:6,proxyCall
+FNDA:0,proxyCall
+FN:9,withdraw
+FNDA:0,withdraw
+end_of_record

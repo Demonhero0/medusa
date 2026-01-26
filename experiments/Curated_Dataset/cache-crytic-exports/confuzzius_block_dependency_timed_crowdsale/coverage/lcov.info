@@ -1,0 +1,8 @@
+TN:
+SF:/disk1/sujzh3/SmartFuzz/medusa/tmp_experiments/curated/dataset/confuzzius_block_dependency/timed_crowdsale.sol
+DA:9,1
+DA:11,0
+DA:13,0
+FN:11,isSaleFinished
+FNDA:0,isSaleFinished
+end_of_record
