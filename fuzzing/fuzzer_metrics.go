@@ -4,6 +4,12 @@ import (
 	"math/big"
 
 	"github.com/crytic/medusa/fuzzing/calls"
+	"github.com/crytic/medusa/fuzzing/config"
+	branchcoverage "github.com/crytic/medusa/fuzzing/fitnessmetrics/branchcoverage"
+	codecoverage "github.com/crytic/medusa/fuzzing/fitnessmetrics/codecoverage"
+	dataflow "github.com/crytic/medusa/fuzzing/fitnessmetrics/dataflow"
+	storagewrite "github.com/crytic/medusa/fuzzing/fitnessmetrics/storagewrite"
+	tokenflow "github.com/crytic/medusa/fuzzing/fitnessmetrics/tokenflow"
 	"github.com/crytic/medusa/fuzzing/reverts"
 )
 
@@ -12,6 +18,25 @@ type FuzzerMetrics struct {
 	// workerMetrics describes the metrics for each individual worker. This expands as needed and some slots may be nil
 	// while workers are initializing, as it corresponds to the indexes in Fuzzer.workers.
 	workerMetrics []fuzzerWorkerMetrics
+
+	// indicator tracers are used to record metrics during fuzzing.
+	//codeCoverageMaps describes the total instructions being executed across all corpus call sequences
+	codeCoverageMaps *codecoverage.CoverageMaps
+
+	// branchCoverageMaps describes the total branches known to be achieved across all corpus call sequences
+	branchCoverageMaps *branchcoverage.CoverageMaps
+
+	// dataflowMaps describes the triggered dataflw
+	dataflowMaps *dataflow.DataflowSet
+
+	// storageWriteMaps describes the storage slots being written
+	storageWriteMaps *storagewrite.StorageWriteSet
+
+	// tokenflowMaps describes the token flow being triggered
+	tokenflowMaps *tokenflow.TokenflowSet
+
+	// fuzzingConfig describes the configuration for fuzzing.
+	fuzzingConfig *config.FuzzingConfig
 }
 
 // fuzzerWorkerMetrics represents metrics for a single FuzzerWorker instance.
@@ -42,7 +67,7 @@ type fuzzerWorkerMetrics struct {
 // newFuzzerMetrics obtains a new FuzzerMetrics struct for a given number of workers specified by workerCount.
 // An optional channel for sending revert metrics updates to the revert reporter is also provided.
 // Returns the new FuzzerMetrics object.
-func newFuzzerMetrics(workerCount int, revertMetricsCh chan reverts.RevertMetricsUpdate) *FuzzerMetrics {
+func newFuzzerMetrics(workerCount int, revertMetricsCh chan reverts.RevertMetricsUpdate, fuzzingConfig *config.FuzzingConfig) *FuzzerMetrics {
 	// Create a new metrics struct and return it with as many slots as required.
 	metrics := FuzzerMetrics{
 		workerMetrics: make([]fuzzerWorkerMetrics, workerCount),
@@ -56,6 +81,14 @@ func newFuzzerMetrics(workerCount int, revertMetricsCh chan reverts.RevertMetric
 		metrics.workerMetrics[i].revertMetricsChan = revertMetricsCh
 
 	}
+
+	// init indicators maps
+	metrics.fuzzingConfig = fuzzingConfig
+	metrics.codeCoverageMaps = codecoverage.NewCoverageMaps()
+	metrics.branchCoverageMaps = branchcoverage.NewCoverageMaps()
+	metrics.dataflowMaps = dataflow.NewDataflowSet()
+	metrics.storageWriteMaps = storagewrite.NewStorageWriteSet()
+	metrics.tokenflowMaps = tokenflow.NewTokenflowSet()
 	return &metrics
 }
 
@@ -128,4 +161,72 @@ func (m *fuzzerWorkerMetrics) updateRevertMetrics(callSequenceElement *calls.Cal
 		FunctionName:    callSequenceElement.Call.DataAbiValues.Method.Name,
 		ExecutionResult: callSequenceElement.ChainReference.MessageResults().ExecutionResult,
 	}
+}
+
+func (m *FuzzerMetrics) updateIndicators(lastCall *calls.CallSequenceElement) error {
+
+	lastCallChainReference := lastCall.ChainReference
+	lastMessageResult := lastCallChainReference.Block.MessageResults[lastCallChainReference.TransactionIndex]
+
+	if m.fuzzingConfig.MetricRecordConfig.CodeCoverageEnabled {
+		codeCoverageMaps := codecoverage.GetCoverageTracerResults(lastMessageResult)
+		_, err := m.codeCoverageMaps.Update(codeCoverageMaps)
+		if err != nil {
+			return err
+		}
+	}
+
+	if m.fuzzingConfig.MetricRecordConfig.BranchCoverageEnabled {
+		branchCoverageMaps := branchcoverage.GetCoverageTracerResults(lastMessageResult)
+		_, err := m.branchCoverageMaps.Update(branchCoverageMaps)
+		if err != nil {
+			return err
+		}
+	}
+
+	if m.fuzzingConfig.MetricRecordConfig.DataflowEnabled {
+		dataflowMaps := dataflow.GetDataflowTracerResults(lastMessageResult)
+		_, err := m.dataflowMaps.Update(dataflowMaps)
+		if err != nil {
+			return err
+		}
+	}
+
+	if m.fuzzingConfig.MetricRecordConfig.StorageWriteEnabled {
+		storageWriteMaps := storagewrite.GetStorageWriteTracerResults(lastMessageResult)
+		_, err := m.storageWriteMaps.Update(storageWriteMaps)
+		if err != nil {
+			return err
+		}
+	}
+
+	if m.fuzzingConfig.MetricRecordConfig.TokenflowEnabled {
+		tokenflowMaps := tokenflow.GetTokenflowTracerResults(lastMessageResult)
+		_, err := m.tokenflowMaps.Update(tokenflowMaps)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// CoverageMaps exposes coverage details for all call sequences known to the corpus.
+func (m *FuzzerMetrics) CodeCoverageMaps() *codecoverage.CoverageMaps {
+	return m.codeCoverageMaps
+}
+
+func (m *FuzzerMetrics) BranchCoverageMaps() *branchcoverage.CoverageMaps {
+	return m.branchCoverageMaps
+}
+
+func (m *FuzzerMetrics) DataflowSet() *dataflow.DataflowSet {
+	return m.dataflowMaps
+}
+
+func (m *FuzzerMetrics) StorageWriteMaps() *storagewrite.StorageWriteSet {
+	return m.storageWriteMaps
+}
+
+func (m *FuzzerMetrics) TokenflowMaps() *tokenflow.TokenflowSet {
+	return m.tokenflowMaps
 }

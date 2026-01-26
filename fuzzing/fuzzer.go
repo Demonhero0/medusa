@@ -948,7 +948,7 @@ func (f *Fuzzer) Start() error {
 	f.revertReporter.Start(f.ctx)
 
 	// Initialize our metrics and valueGenerator.
-	f.metrics = newFuzzerMetrics(f.config.Fuzzing.Workers, f.revertReporter.RevertMetricsCh)
+	f.metrics = newFuzzerMetrics(f.config.Fuzzing.Workers, f.revertReporter.RevertMetricsCh, &f.config.Fuzzing)
 
 	// Initialize our test cases and providers
 	f.testCasesLock.Lock()
@@ -1222,29 +1222,29 @@ func (f *Fuzzer) printMetricsLoop() {
 
 		// For fitness metrics
 		if f.config.Fuzzing.UseCodeCoverageTracing() {
-			c, t := f.corpus.CodeCoverageMaps().TotalCodeCoverage([]common.Address{})
+			c, t := f.metrics.CodeCoverageMaps().TotalCodeCoverage([]common.Address{})
 			rate := float64(c) / float64(t)
 			logBuffer.Append(", code coverage: ", colors.Bold, fmt.Sprintf("%v (%.2f)", c, rate), colors.Reset)
 		}
 
 		if f.config.Fuzzing.UseBranchCoverageTracing() {
-			c, t := f.corpus.BranchCoverageMaps().TotalBranchCoverage([]common.Address{})
+			c, t := f.metrics.BranchCoverageMaps().TotalBranchCoverage([]common.Address{})
 			rate := float64(c) / float64(t)
 			logBuffer.Append(", branch coverage: ", colors.Bold, fmt.Sprintf("%v (%.2f)", c, rate), colors.Reset)
 		}
 
 		if f.config.Fuzzing.UseDataflowTracing() {
-			c := f.corpus.DataflowSet().TotalDataflowCount()
+			c := f.metrics.DataflowSet().TotalDataflowCount()
 			logBuffer.Append(", dataflow: ", colors.Bold, fmt.Sprintf("%d", c), colors.Reset)
 		}
 
 		if f.config.Fuzzing.UseStorageWriteTracing() {
-			c := f.corpus.StorageWriteMaps().TotalStorageWriteCount()
+			c := f.metrics.StorageWriteMaps().TotalStorageWriteCount()
 			logBuffer.Append(", storage writes: ", colors.Bold, fmt.Sprintf("%d", c), colors.Reset)
 		}
 
 		if f.config.Fuzzing.UseTokenflowTracing() {
-			c := f.corpus.TokenflowMaps().TotalTokenflowCount(true)
+			c := f.metrics.TokenflowMaps().TotalTokenflowCount(true)
 			logBuffer.Append(", tokenflow: ", colors.Bold, fmt.Sprintf("%v", c), colors.Reset)
 		}
 

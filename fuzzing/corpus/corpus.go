@@ -651,96 +651,68 @@ func (c *Corpus) CheckSequenceMetricAndUpdate(callSequence calls.CallSequence, m
 
 	updated := false
 
-	if c.fuzzingConfig.UseCodeCoverageTracing() {
+	if c.fuzzingConfig.FitnessMetricConfig.CodeCoverageEnabled {
 		codeCoverageMaps := codecoverage.GetCoverageTracerResults(lastMessageResult)
 		coverageUpdated, err := c.codeCoverageMaps.Update(codeCoverageMaps)
 		if err != nil {
 			return err
 		}
-		if c.fuzzingConfig.FitnessMetricConfig.CodeCoverageEnabled {
-			updated = coverageUpdated || updated
-		}
-		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		codecoverage.RemoveCoverageTracerResults(lastMessageResult)
+		updated = coverageUpdated || updated
 	}
 
 	// Merge the coverage maps into our total coverage maps and check if we had an update.
-	if c.fuzzingConfig.UseBranchCoverageTracing() {
+	if c.fuzzingConfig.FitnessMetricConfig.BranchCoverageEnabled {
 		coverageMaps := branchcoverage.GetCoverageTracerResults(lastMessageResult)
 		coverageUpdated, err := c.branchCoverageMaps.Update(coverageMaps)
 		if err != nil {
 			return err
 		}
-		if c.fuzzingConfig.FitnessMetricConfig.BranchCoverageEnabled {
-			updated = coverageUpdated || updated
-		}
-		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		branchcoverage.RemoveCoverageTracerResults(lastMessageResult)
+		updated = coverageUpdated || updated
 	}
 
-	if c.fuzzingConfig.UseBranchDistanceTracing() {
+	if c.fuzzingConfig.FitnessMetricConfig.BranchDistanceEnabled {
 		branchdistanceMaps := branchdistance.GetBranchDistanceTracerResults(lastMessageResult)
 		branchDistanceUpdated, err := c.branchDistanceMaps.Update(branchdistanceMaps)
 		if err != nil {
 			return err
 		}
-		if c.fuzzingConfig.FitnessMetricConfig.BranchDistanceEnabled {
-			updated = branchDistanceUpdated || updated
-		}
-		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		branchdistance.RemoveBranchDistanceTracerResults(lastMessageResult)
+		updated = branchDistanceUpdated || updated
 	}
 
-	if c.fuzzingConfig.UseCmpDistanceTracing() {
+	if c.fuzzingConfig.FitnessMetricConfig.CmpDistanceEnabled {
 		cmpDistanceMaps := cmpdistance.GetCmpDistanceTracerResults(lastMessageResult)
 		cmpDistanceUpdated, err := c.cmpDistanceMaps.Update(cmpDistanceMaps)
 		if err != nil {
 			return err
 		}
-		if c.fuzzingConfig.FitnessMetricConfig.CmpDistanceEnabled {
-			updated = cmpDistanceUpdated || updated
-		}
-		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		cmpdistance.RemoveCmpDistanceTracerResults(lastMessageResult)
+		updated = cmpDistanceUpdated || updated
 	}
 
-	if c.fuzzingConfig.UseDataflowTracing() {
+	if c.fuzzingConfig.FitnessMetricConfig.DataflowEnabled {
 		dataflowMaps := dataflow.GetDataflowTracerResults(lastMessageResult)
 		dataflowUpdated, err := c.dataflowMaps.Update(dataflowMaps)
 		if err != nil {
 			return err
 		}
-		if c.fuzzingConfig.FitnessMetricConfig.DataflowEnabled {
-			updated = dataflowUpdated || updated
-		}
-		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		dataflow.RemoveDataflowTracerResults(lastMessageResult)
+		updated = dataflowUpdated || updated
 	}
 
-	if c.fuzzingConfig.UseStorageWriteTracing() {
+	if c.fuzzingConfig.FitnessMetricConfig.StorageWriteEnabled {
 		storageWriteMaps := storagewrite.GetStorageWriteTracerResults(lastMessageResult)
 		storageWriteUpdated, err := c.storageWriteMaps.Update(storageWriteMaps)
 		if err != nil {
 			return err
 		}
-		if c.fuzzingConfig.FitnessMetricConfig.StorageWriteEnabled {
-			updated = storageWriteUpdated || updated
-		}
-		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		storagewrite.RemoveStorageWriteTracerResults(lastMessageResult)
+		updated = storageWriteUpdated || updated
 	}
 
-	if c.fuzzingConfig.UseTokenflowTracing() {
+	if c.fuzzingConfig.FitnessMetricConfig.TokenflowEnabled {
 		tokenflowMaps := tokenflow.GetTokenflowTracerResults(lastMessageResult)
 		tokenflowUpdated, err := c.tokenflowMaps.Update(tokenflowMaps)
 		if err != nil {
 			return err
 		}
-		if c.fuzzingConfig.FitnessMetricConfig.TokenflowEnabled {
-			updated = tokenflowUpdated || updated
-		}
-		// Memory optimization: Remove them from the results now that we obtained them, to free memory later.
-		tokenflow.RemoveTokenflowTracerResults(lastMessageResult)
+		updated = tokenflowUpdated || updated
 	}
 
 	if c.fuzzingConfig.UseBugDetector() {

@@ -17,43 +17,43 @@ func (fw *FuzzerWorker) attachTracersToChain(initializedChain *chain.TestChain) 
 	// attach fitness metric tracers
 
 	// code coverage tracer
-	if fw.fuzzer.config.Fuzzing.UseCodeCoverageTracing() {
+	if fw.fuzzer.config.Fuzzing.FitnessMetricConfig.CodeCoverageEnabled {
 		fw.codeCoverageTracer = codecoverage.NewCoverageTracer(fw.fuzzer.contractDefinitions)
 		initializedChain.AddTracer(fw.codeCoverageTracer.NativeTracer(), true, false)
 	}
 
 	// branch coverage tracer
-	if fw.fuzzer.config.Fuzzing.UseBranchCoverageTracing() {
+	if fw.fuzzer.config.Fuzzing.FitnessMetricConfig.BranchCoverageEnabled {
 		fw.branchCoverageTracer = branchcoverage.NewCoverageTracer(fw.fuzzer.contractDefinitions)
 		initializedChain.AddTracer(fw.branchCoverageTracer.NativeTracer(), true, false)
 	}
 
 	// cmp distance tracer
-	if fw.fuzzer.config.Fuzzing.UseCmpDistanceTracing() {
+	if fw.fuzzer.config.Fuzzing.FitnessMetricConfig.CmpDistanceEnabled {
 		fw.cmpDistanceTracer = cmpdistance.NewCmpDistanceTracer(fw.fuzzer.contractDefinitions)
 		initializedChain.AddTracer(fw.cmpDistanceTracer.NativeTracer(), true, false)
 	}
 
 	// branch distance tracer
-	if fw.fuzzer.config.Fuzzing.UseBranchDistanceTracing() {
+	if fw.fuzzer.config.Fuzzing.FitnessMetricConfig.BranchDistanceEnabled {
 		fw.branchDistanceTracer = branchdistance.NewBranchDistanceTracer(fw.fuzzer.contractDefinitions)
 		initializedChain.AddTracer(fw.branchDistanceTracer.NativeTracer(), true, false)
 	}
 
 	// data flow tracer
-	if fw.fuzzer.config.Fuzzing.UseDataflowTracing() {
+	if fw.fuzzer.config.Fuzzing.FitnessMetricConfig.DataflowEnabled {
 		fw.dataFlowTracer = dataflow.NewDataflowTracer()
 		initializedChain.AddTracer(fw.dataFlowTracer.NativeTracer(), true, false)
 	}
 
 	// storage write tracer
-	if fw.fuzzer.config.Fuzzing.UseStorageWriteTracing() {
+	if fw.fuzzer.config.Fuzzing.FitnessMetricConfig.StorageWriteEnabled {
 		fw.storageWriteTracer = storagewrite.NewStorageWriteTracer()
 		initializedChain.AddTracer(fw.storageWriteTracer.NativeTracer(), true, false)
 	}
 
 	// token flow tracer
-	if fw.fuzzer.config.Fuzzing.UseTokenflowTracing() {
+	if fw.fuzzer.config.Fuzzing.FitnessMetricConfig.TokenflowEnabled {
 		fw.tokenflowTracer = tokenflow.NewTokenflowTracer()
 		initializedChain.AddTracer(fw.tokenflowTracer.NativeTracer(), true, false)
 	}
@@ -84,4 +84,36 @@ func (fw *FuzzerWorker) attachTracersToChain(initializedChain *chain.TestChain) 
 	// debug: tracing execution trace
 	// fw.executionTracer = executiontracer.NewExecutionTracer(fw.fuzzer.contractDefinitions, initializedChain, config.VeryVeryVerbose)
 	// initializedChain.AddTracer(fw.executionTracer.NativeTracer(), true, false)
+
+	// for fair comparison, we need to attach the indicator tracers solely
+
+	// code coverage tracer
+	if fw.fuzzer.config.Fuzzing.MetricRecordConfig.CodeCoverageEnabled {
+		fw.codeCoverageIndicatorTracer = codecoverage.NewCoverageTracer(fw.fuzzer.contractDefinitions)
+		initializedChain.AddTracer(fw.codeCoverageIndicatorTracer.NativeTracer(), true, false)
+	}
+
+	// branch coverage tracer
+	if fw.fuzzer.config.Fuzzing.MetricRecordConfig.BranchCoverageEnabled {
+		fw.branchCoverageIndicatorTracer = branchcoverage.NewCoverageTracer(fw.fuzzer.contractDefinitions)
+		initializedChain.AddTracer(fw.branchCoverageIndicatorTracer.NativeTracer(), true, false)
+	}
+
+	// data flow tracer
+	if fw.fuzzer.config.Fuzzing.MetricRecordConfig.DataflowEnabled {
+		fw.dataFlowIndicatorTracer = dataflow.NewDataflowTracer()
+		initializedChain.AddTracer(fw.dataFlowIndicatorTracer.NativeTracer(), true, false)
+	}
+
+	// storage write tracer
+	if fw.fuzzer.config.Fuzzing.MetricRecordConfig.StorageWriteEnabled {
+		fw.storageWriteIndicatorTracer = storagewrite.NewStorageWriteTracer()
+		initializedChain.AddTracer(fw.storageWriteIndicatorTracer.NativeTracer(), true, false)
+	}
+
+	// token flow tracer
+	if fw.fuzzer.config.Fuzzing.MetricRecordConfig.TokenflowEnabled {
+		fw.tokenflowIndicatorTracer = tokenflow.NewTokenflowTracer()
+		initializedChain.AddTracer(fw.tokenflowIndicatorTracer.NativeTracer(), true, false)
+	}
 }

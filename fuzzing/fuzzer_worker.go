@@ -85,6 +85,7 @@ type FuzzerWorker struct {
 	// codeCoverageTracer describes the tracer used to collect code coverage maps during fuzzing campaigns.
 	codeCoverageTracer *codecoverage.CoverageTracer
 
+	// branchCoverageTracer is used to collect branch coverage data during fuzzing.
 	branchCoverageTracer *branchcoverage.CoverageTracer
 
 	// cmpDistanceTracer is used to collect comparison operation data during fuzzing.
@@ -104,6 +105,13 @@ type FuzzerWorker struct {
 
 	// bugDetectorTracer is used to detect the bugs during fuzzing.
 	bugDetectorTracer *bugdetector.BugDetectorTracer
+
+	// for indicator tracers solely
+	codeCoverageIndicatorTracer   *codecoverage.CoverageTracer
+	branchCoverageIndicatorTracer *branchcoverage.CoverageTracer
+	dataFlowIndicatorTracer       *dataflow.DataflowTracer
+	storageWriteIndicatorTracer   *storagewrite.StorageWriteTracer
+	tokenflowIndicatorTracer      *tokenflow.TokenflowTracer
 }
 
 // newFuzzerWorker creates a new FuzzerWorker, assigning it the provided worker index/id and associating it to the
@@ -468,6 +476,12 @@ func (fw *FuzzerWorker) testNextCallSequence() ([]ShrinkCallSequenceRequest, err
 		lastCallSequenceElement := currentlyExecutedSequence[len(currentlyExecutedSequence)-1]
 		fw.workerMetrics().gasUsed.Add(fw.workerMetrics().gasUsed, new(big.Int).SetUint64(lastCallSequenceElement.ChainReference.Block.MessageResults[lastCallSequenceElement.ChainReference.TransactionIndex].Receipt.GasUsed))
 		fw.workerMetrics().updateRevertMetrics(lastCallSequenceElement)
+
+		// Update indicators for our fuzzing session
+		err = fw.fuzzer.metrics.updateIndicators(latestCallSequenceElement)
+		if err != nil {
+			return true, fmt.Errorf("error updating fuzzing indicators from call sequence element: %v", err)
+		}
 
 		// If our fuzzer context or the emergency context is cancelled, exit out immediately without results.
 		if utils.CheckContextDone(fw.fuzzer.ctx) {
