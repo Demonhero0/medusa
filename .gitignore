@@ -37,4 +37,6 @@ tmp_*
 .venv
 
 .medusacache
+crytic-export
+smartfitness
 

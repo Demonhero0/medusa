@@ -1,50 +1,43 @@
-# medusa
+# SmartFitness
 
-`medusa` is a cross-platform [go-ethereum](https://github.com/ethereum/go-ethereum/)-based smart contract fuzzer inspired by [Echidna](https://github.com/crytic/echidna).
-It provides parallelized fuzz testing of smart contracts through CLI, or its Go API that allows custom user-extended testing methodology.
+`smartfitness` is a unified fuzzing framework for [go-ethereum](https://github.com/ethereum/go-ethereum/)-based smart contracts. 
 
-**Disclaimer**: The Go-level testing API is still **under development** and is subject to breaking changes.
-
-## Features
-
-`medusa` provides support for:
-
-- ✔️**Parallel fuzzing and testing** methodologies across multiple workers (threads)
-- ✔️**Assertion and property testing**: built-in support for writing basic Solidity property tests and assertion tests
-- ✔️**Mutational value generation**: fed by compilation and runtime values.
-- ✔️**Coverage collecting**: Coverage increasing call sequences are stored in the corpus
-- ✔️**Coverage guided fuzzing**: Coverage increasing call sequences from the corpus are mutated to further guide the fuzzing campaign
-- ✔️**Extensible low-level testing API** through events and hooks provided throughout the fuzzer, workers, and test chains.
-- ❌ **Extensible high-level testing API** allowing for the addition of per-contract or global post call/event property tests with minimal effort.
-
-## Documentation
-
-To learn more about how to install and use `medusa`, please refer to our [documentation](./docs/src/SUMMARY.md).
-
-For a better viewing experience, we recommend you install [mdbook](https://rust-lang.github.io/mdBook/guide/installation.html)
-and then running the following steps from medusa's source directory:
-
-```bash
-cd docs
-mdbook serve
-```
+Based on [medusa](https://github.com/crytic/medusa), `smartfitness` supports flexible evaluation of test seeds using a variety of fitness metrics, enabling easy integration and comparative analysis of different fitness metrics within the same framework, whose implementation is in `fuzzing/fitnessmetrics`. Second, it implement several bug oracles in `fuzzing/bugdetector`, making it support detecting common bugs like Reentrancy and Integer Overflows.
 
 ## Install
 
-Run the following command to install the latest version of `medusa`:
-
-```shell
-
-go install github.com/crytic/medusa@latest
+```
+bash build.sh
 ```
 
-For more information on building from source, using package managers, or obtaining binaries for Windows and Linux,
-please refer to the [installation guide](./docs/src/getting_started/installation.md).
+## Usage
 
-## Contributing
+### Loacl Testing
 
-For information about how to contribute to this project, check out the [CONTRIBUTING](./CONTRIBUTING.md) guidelines.
+Run the cammond for execution, where `--config` is the path of config file, `--compilation-target` is the `.sol` file to compile, `--target-contracts` is the names of the contracts to test.
+
+```
+./smartfitness fuzz --config example/config.json --compilation-target example.sol --target-contracts Example
+```
+
+### On-chain Testing
+
+If you want to test the smart contracts deployed on chain, set the on-chain mode in config file (e.g., `example/config_onchain.json`).
+
+```
+    "forkconfig": {
+        "forkModeEnabled": true, // Turn on for on-chain testing
+        "rpcUrl": "http://localhost:18545", // Archive nodes that provide RPC services
+        "rpcBlock": 9894152, // The similuated block height
+        "poolSize": 20
+    }
+```
+
+After that, run the cammond for execution.
+```
+./smartfitness fuzz --config example/config_onchain.json
+```
 
 ## License
 
-`medusa` is licensed and distributed under the [AGPLv3](./LICENSE).
+`smartfitness` is licensed and distributed under the [AGPLv3](./LICENSE).

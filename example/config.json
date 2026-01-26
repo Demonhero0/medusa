@@ -1,0 +1,105 @@
+{
+    "fuzzing": {
+        "workers": 1,
+        "workerResetLimit": 50,
+        "timeout": 600,
+        "testLimit": 0,
+        "shrinkLimit": 500,
+        "callSequenceLength": 50,
+        "corpusDirectory": "",
+        "coverageEnabled": false,
+        "fitnessMetricConfig": {
+            "codeCoverageEnabled": false,
+            "branchCoverageEnabled": false,
+            "storageWriteEnabled": false,
+            "dataflowEnabled": false,
+            "branchDistanceEnabled": false,
+            "cmpDistanceEnabled": false,
+            "tokenflowEnabled": false         
+        },
+        "metricRecordConfig": {
+            "codeCoverageEnabled": true,
+            "branchCoverageEnabled": true,
+            "storageWriteEnabled": true,
+            "dataflowEnabled": true,
+            "tokenflowEnabled": true
+        },
+        "bugDetectionConfig": {
+            "enabled": true,
+            "integerOverflow": true,
+            "reentrancy": true,
+            "etherLeaking": true,
+            "suicidal": true,
+            "blockDependency": true,
+            "unsafeDelegateCall": true
+        },
+        "targetContracts": [],
+        "targetContractsBalances": [
+            "0x0"
+        ],
+        "constructorArgs": {},
+        "deployerAddress": "0x10000",
+        "senderAddresses": [
+            "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+        ],
+        "senderAddressBalances": [
+            100000000000000000000000000
+        ],
+        "blockNumberDelayMax": 60480,
+        "blockTimestampDelayMax": 604800,
+        "blockGasLimit": 125000000,
+        "transactionGasLimit": 12500000,
+        "testing": {
+            "stopOnFailedTest": true,
+            "stopOnNoTests": false,
+            "testAllContracts": true,
+            "traceAll": true,
+            "helperContractConfig" : {
+                "enabled" : true
+            },
+            "assertionTesting" : {
+                "enabled": false
+            },
+            "propertyTesting": {
+                "enabled": false
+            },
+            "optimizationTesting": {
+                "enabled": false
+            }
+        },
+        "chainConfig": {
+            "codeSizeCheckDisabled": true,
+            "cheatCodes": {
+                "cheatCodesEnabled": true,
+                "enableFFI": false
+            },
+            "SkipAccountChecks": true,
+            "forkconfig": {
+                "forkModeEnabled": false,
+                "rpcUrl": "http://localhost:18545",
+                "rpcBlock": 18730462,
+                "poolSize": 20
+            },
+            "stateOverrides": {
+                "0xD87a566b05882a29B629B036A4dbf6cBd519bd2D": {
+                    "balance": "0xde0b6b3a7640000"
+                }
+            }
+        }
+    },
+    "compilation": {
+        "platform": "crytic-compile",
+        "platformConfig": {
+            "target": ".",
+            "solcVersion": "0.4.25",
+            "exportDirectory": "",
+            "args": [],
+            "force": false
+        }
+    },
+    "logging": {
+        "level": "info",
+        "logDirectory": "",
+        "noColor": true
+    }
+}
