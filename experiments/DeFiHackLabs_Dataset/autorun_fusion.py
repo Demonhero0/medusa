@@ -149,7 +149,7 @@ def run_smartfitness(config_types, t, i, total, name, block, addresses):
         config_file.write(config)
     
     with open(f'{directory}/stdout.log', 'w') as stdout, open(f'{directory}/stderr.log', 'w') as stderr:
-        subprocess.run(['../../../../../smartfitness', 'fuzz', '--config', './config.json'], stdout=stdout, stderr=stderr, text=True, cwd=directory)
+        subprocess.run(['../../../../../smartseed', 'fuzz', '--config', './config.json'], stdout=stdout, stderr=stderr, text=True, cwd=directory)
 
 config_types_list = [
     ["branchCoverage", "branchDistance"],

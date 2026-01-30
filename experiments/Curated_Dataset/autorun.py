@@ -186,7 +186,7 @@ def run_smartfitness(config_type, t, i, total, contract, path):
         config_file.write(config)
     
     with open(f'{dir}/stdout.log', 'w') as stdout, open(f'{dir}/stderr.log', 'w') as stderr:
-        subprocess.run(['../../../../../smartfitness', 'fuzz', '--compilation-target', f'{path}', '--config', './config.json'], stdout=stdout, stderr=stderr, text=True, cwd=dir)
+        subprocess.run(['../../../../../smartseed', 'fuzz', '--compilation-target', f'{path}', '--config', './config.json'], stdout=stdout, stderr=stderr, text=True, cwd=dir)
 
 DATASET_PATH = 'dataset'
 

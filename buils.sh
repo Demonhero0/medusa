@@ -1,2 +1,2 @@
 #!/bin/bash
-go build -o smartfitness
+go build -o smartseed
